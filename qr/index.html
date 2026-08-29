@@ -1,0 +1,601 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Imprint — QR generator</title>
+  <meta name="description" content="Compose a QR mark as you type. Choose colours, size, and error correction, then download a PNG." />
+  <meta name="theme-color" content="#f2efe6" />
+  <link rel="icon" type="image/svg+xml" href="./favicon.svg" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;600&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --bg: #f2efe6;
+      --fg: #1c1915;
+      --card: #faf8f2;
+      --muted: #e7e2d6;
+      --muted-fg: #6f6a62;
+      --border: #d8d1c3;
+      --primary: #1c1915;
+      --primary-fg: #faf8f2;
+      --accent: #ebe6da;
+      --danger: #8f2d22;
+      --radius-sm: 8px;
+      --radius-md: 12px;
+      --radius-lg: 16px;
+      --shadow:
+        0 0 0 1px rgb(28 25 21 / 0.06),
+        0 1px 2px -1px rgb(28 25 21 / 0.06),
+        0 2px 8px 0 rgb(28 25 21 / 0.04);
+      --ease: cubic-bezier(0.22, 1, 0.36, 1);
+    }
+    * { box-sizing: border-box; }
+    html, body {
+      margin: 0;
+      min-height: 100dvh;
+      background: var(--bg);
+      color: var(--fg);
+      font-family: "IBM Plex Sans", ui-sans-serif, system-ui, sans-serif;
+      line-height: 1.5;
+      -webkit-font-smoothing: antialiased;
+    }
+    button:not(:disabled), [role="button"]:not(:disabled) { cursor: pointer; }
+    h1, h2 { text-wrap: balance; }
+    p { text-wrap: pretty; }
+    :focus-visible { outline: 2px solid var(--fg); outline-offset: 2px; }
+    .page {
+      width: 100%;
+      max-width: 72rem;
+      margin: 0 auto;
+      padding: 2rem 1rem 3rem;
+      overflow-x: clip;
+    }
+    @media (min-width: 640px) { .page { padding: 2.5rem 1.5rem 3.5rem; } }
+    @media (min-width: 1024px) { .page { padding: 3.5rem 2rem 4rem; } }
+    header {
+      display: flex;
+      flex-direction: column;
+      gap: 0.75rem;
+      margin-bottom: 2rem;
+    }
+    @media (min-width: 640px) {
+      header { flex-direction: row; align-items: flex-end; justify-content: space-between; margin-bottom: 2.5rem; }
+      .lede { text-align: right; }
+    }
+    .brand { display: flex; align-items: flex-start; gap: 0.75rem; }
+    .mark {
+      margin-top: 0.25rem;
+      width: 2.5rem; height: 2.5rem;
+      display: grid; place-items: center;
+      border-radius: var(--radius-sm);
+      background: var(--primary); color: var(--primary-fg);
+      flex-shrink: 0;
+    }
+    .kicker {
+      margin: 0;
+      font-size: 0.75rem;
+      font-weight: 500;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: var(--muted-fg);
+    }
+    h1 {
+      margin: 0;
+      font-family: Fraunces, "Iowan Old Style", Georgia, serif;
+      font-size: clamp(2.25rem, 1.8rem + 2vw, 3rem);
+      font-weight: 500;
+      letter-spacing: -0.03em;
+      line-height: 1.1;
+    }
+    .lede { margin: 0; max-width: 24rem; font-size: 0.875rem; color: var(--muted-fg); }
+    .layout {
+      display: grid;
+      gap: 1.5rem;
+      align-items: start;
+    }
+    @media (min-width: 1024px) {
+      .layout { grid-template-columns: 1fr 1fr; gap: 2.5rem; }
+      .preview-col { order: 1; position: sticky; top: 2rem; }
+      .form-col { order: 0; }
+    }
+    .preview-col { order: -1; min-width: 0; }
+    .form-col { min-width: 0; }
+    .panel {
+      background: var(--card);
+      border-radius: var(--radius-xl, 24px);
+      border-radius: 24px;
+      padding: 1.25rem;
+      box-shadow: var(--shadow);
+    }
+    @media (min-width: 640px) { .panel { padding: 1.5rem; } }
+    form.panel { display: flex; flex-direction: column; gap: 1.75rem; }
+    .field { display: flex; flex-direction: column; gap: 0.5rem; }
+    .field-head { display: flex; align-items: baseline; justify-content: space-between; gap: 0.75rem; }
+    label, legend {
+      font-size: 0.875rem;
+      font-weight: 500;
+      color: var(--fg);
+    }
+    legend { padding: 0; }
+    fieldset { border: 0; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 0.75rem; }
+    .hint, .count { font-size: 0.875rem; color: var(--muted-fg); }
+    .count { font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace; font-size: 0.75rem; font-variant-numeric: tabular-nums; }
+    textarea {
+      width: 100%;
+      min-height: 9rem;
+      padding: 0.75rem;
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      background: var(--card);
+      color: var(--fg);
+      font: inherit;
+      font-size: 1rem;
+      resize: vertical;
+    }
+    .colour-row { display: flex; align-items: flex-end; gap: 0.5rem; }
+    .colour-row .field { flex: 1; min-width: 0; }
+    .swatch-input {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.375rem 0.5rem;
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      background: var(--card);
+    }
+    input[type="color"] {
+      width: 2.25rem; height: 2.25rem;
+      padding: 0.125rem;
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      background: transparent;
+      cursor: pointer;
+      flex-shrink: 0;
+    }
+    .hex {
+      min-width: 0;
+      flex: 1;
+      border: 0;
+      background: transparent;
+      color: var(--fg);
+      font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+      font-size: 0.875rem;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+    }
+    .hex:focus { outline: none; }
+    .icon-btn, .preset, .btn, .seg button {
+      font: inherit;
+      color: inherit;
+      border: 0;
+    }
+    .icon-btn {
+      width: 2.75rem; height: 2.75rem;
+      display: grid; place-items: center;
+      border-radius: var(--radius-sm);
+      background: transparent;
+      flex-shrink: 0;
+      margin-bottom: 0.125rem;
+      transition: background 150ms var(--ease), transform 150ms var(--ease);
+    }
+    .icon-btn:hover { background: var(--accent); }
+    .icon-btn:active { transform: scale(0.96); }
+    .presets { display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem; }
+    @media (min-width: 640px) { .presets { grid-template-columns: repeat(4, 1fr); } }
+    .preset {
+      height: 2.75rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      background: var(--card);
+      font-size: 0.75rem;
+      font-weight: 500;
+      transition: background 150ms var(--ease), transform 150ms var(--ease);
+    }
+    .preset:hover { background: var(--accent); }
+    .preset:active { transform: scale(0.96); }
+    .chip {
+      width: 1.25rem; height: 1.25rem;
+      border-radius: 4px;
+      border: 1px solid var(--border);
+    }
+    .warn { margin: 0; font-size: 0.875rem; color: var(--danger); }
+    input[type="range"] {
+      width: 100%;
+      height: 1.25rem;
+      accent-color: var(--fg);
+    }
+    .seg {
+      display: flex;
+      height: 2.75rem;
+      gap: 0.25rem;
+      padding: 0.25rem;
+      border-radius: var(--radius-sm);
+      background: var(--muted);
+    }
+    .seg button {
+      flex: 1;
+      min-width: 0;
+      border-radius: 4px;
+      background: transparent;
+      color: var(--muted-fg);
+      font-size: 0.875rem;
+      font-weight: 500;
+      transition: background 150ms var(--ease), color 150ms var(--ease), transform 150ms var(--ease);
+    }
+    .seg button[aria-pressed="true"] {
+      background: var(--card);
+      color: var(--fg);
+      box-shadow: 0 1px 2px rgb(28 25 21 / 0.06);
+    }
+    .seg button:hover { color: var(--fg); }
+    .seg button:active { transform: scale(0.96); }
+    .preview-head { display: flex; align-items: baseline; justify-content: space-between; gap: 0.75rem; margin-bottom: 1.25rem; }
+    .preview-head h2 { margin: 0; font-size: 0.875rem; font-weight: 500; }
+    .stage {
+      position: relative;
+      aspect-ratio: 1;
+      width: 100%;
+      min-width: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md);
+      background: color-mix(in srgb, var(--muted) 60%, transparent);
+    }
+    .stage.has-mark { padding: 1rem; }
+    .stage img {
+      width: 100%;
+      height: auto;
+      max-width: 100%;
+      max-height: 100%;
+      image-rendering: pixelated;
+    }
+    .stage p { margin: 0; padding: 0 1rem; text-align: center; font-size: 0.875rem; color: var(--muted-fg); }
+    .stage .error { color: var(--danger); }
+    .btn {
+      width: 100%;
+      height: 3rem;
+      margin-top: 1.25rem;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+      border-radius: var(--radius-sm);
+      background: var(--primary);
+      color: var(--primary-fg);
+      font-size: 0.875rem;
+      font-weight: 500;
+      transition: opacity 150ms var(--ease), transform 150ms var(--ease);
+    }
+    .btn:hover:not(:disabled) { opacity: 0.9; }
+    .btn:active:not(:disabled) { transform: scale(0.96); }
+    .btn:disabled { opacity: 0.4; cursor: not-allowed; }
+    .sr-only {
+      position: absolute;
+      width: 1px; height: 1px;
+      padding: 0; margin: -1px;
+      overflow: hidden;
+      clip: rect(0,0,0,0);
+      white-space: nowrap;
+      border: 0;
+    }
+    @media (prefers-reduced-motion: reduce) {
+      * { transition: none !important; }
+    }
+  </style>
+</head>
+<body>
+  <div class="page">
+    <header>
+      <div class="brand">
+        <span class="mark" aria-hidden="true">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><rect width="5" height="5" x="3" y="3" rx="1"/><rect width="5" height="5" x="16" y="3" rx="1"/><rect width="5" height="5" x="3" y="16" rx="1"/><path d="M21 16h-3a2 2 0 0 0-2 2v3"/><path d="M21 21v.01"/><path d="M12 7v3a2 2 0 0 1-2 2H7"/><path d="M3 12h.01"/><path d="M12 3h.01"/><path d="M12 16v.01"/><path d="M16 12h1"/><path d="M21 12v.01"/><path d="M12 21v-1"/></svg>
+        </span>
+        <div>
+          <p class="kicker">QR generator</p>
+          <h1>Imprint</h1>
+        </div>
+      </div>
+      <p class="lede">Type a URL or any text. The mark updates instantly. Download a PNG when it looks right.</p>
+    </header>
+
+    <div class="layout">
+      <form class="panel form-col" id="form">
+        <div class="field">
+          <div class="field-head">
+            <label for="content">Content</label>
+            <span class="count" id="count">0 characters</span>
+          </div>
+          <textarea id="content" name="content" spellcheck="false" autocomplete="off" placeholder="https://example.com or any text" aria-describedby="content-help"></textarea>
+          <p class="hint" id="content-help">URLs, Wi-Fi strings, or plain text all work. Keep it short for easier scanning.</p>
+        </div>
+
+        <fieldset>
+          <legend>Colours</legend>
+          <div class="colour-row">
+            <div class="field">
+              <label for="fg">Foreground</label>
+              <div class="swatch-input">
+                <input id="fg" type="color" value="#141210" />
+                <input id="fg-hex" class="hex" type="text" value="#141210" spellcheck="false" autocomplete="off" aria-label="Foreground hex value" />
+              </div>
+            </div>
+            <button class="icon-btn" type="button" id="swap" aria-label="Swap foreground and background colours">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" aria-hidden="true"><path d="M8 3 4 7l4 4"/><path d="M4 7h16"/><path d="m16 21 4-4-4-4"/><path d="M20 17H4"/></svg>
+            </button>
+            <div class="field">
+              <label for="bg">Background</label>
+              <div class="swatch-input">
+                <input id="bg" type="color" value="#ffffff" />
+                <input id="bg-hex" class="hex" type="text" value="#ffffff" spellcheck="false" autocomplete="off" aria-label="Background hex value" />
+              </div>
+            </div>
+          </div>
+          <div class="presets" id="presets"></div>
+          <p class="warn" id="contrast" hidden>These colours are close. Scanners may fail — increase contrast.</p>
+        </fieldset>
+
+        <div class="field">
+          <div class="field-head">
+            <label for="size">Size</label>
+            <span class="count" id="size-value">320 px</span>
+          </div>
+          <input id="size" type="range" min="128" max="1024" step="8" value="320" aria-label="QR code size in pixels" aria-describedby="size-value size-help" />
+          <p class="hint" id="size-help">Export resolution. The preview scales to fit the panel.</p>
+        </div>
+
+        <fieldset>
+          <legend id="ec-legend">Error correction</legend>
+          <div class="seg" id="ec" role="radiogroup" aria-labelledby="ec-legend" aria-describedby="ec-help"></div>
+          <p class="hint" id="ec-help"></p>
+        </fieldset>
+      </form>
+
+      <aside class="preview-col">
+        <div class="panel">
+          <div class="preview-head">
+            <h2>Preview</h2>
+            <p class="count" id="meta">320 × 320 · M</p>
+          </div>
+          <div class="stage" id="stage">
+            <p id="empty">Type a URL or text to compose a mark.</p>
+          </div>
+          <button class="btn" type="button" id="download" disabled>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" aria-hidden="true"><path d="M12 3v12"/><path d="m8 11 4 4 4-4"/><path d="M5 21h14"/></svg>
+            Download PNG
+          </button>
+          <p class="sr-only" id="status" role="status" aria-live="polite"></p>
+        </div>
+      </aside>
+    </div>
+  </div>
+
+  <script type="module">
+    import QRCode from "https://cdn.jsdelivr.net/npm/qrcode@1.5.4/+esm";
+
+    const LEVELS = [
+      { value: "L", label: "Low", recovery: "7%", hint: "Smallest mark" },
+      { value: "M", label: "Medium", recovery: "15%", hint: "Reliable default" },
+      { value: "Q", label: "Quartile", recovery: "25%", hint: "Tolerates wear" },
+      { value: "H", label: "High", recovery: "30%", hint: "Most robust" },
+    ];
+    const PRESETS = [
+      { name: "Ink", fg: "#141210", bg: "#ffffff" },
+      { name: "Navy", fg: "#1e2a3a", bg: "#f4efe4" },
+      { name: "Forest", fg: "#1c3329", bg: "#f3f0e4" },
+      { name: "Invert", fg: "#f4efe4", bg: "#141210" },
+    ];
+
+    const els = {
+      content: document.getElementById("content"),
+      count: document.getElementById("count"),
+      fg: document.getElementById("fg"),
+      bg: document.getElementById("bg"),
+      fgHex: document.getElementById("fg-hex"),
+      bgHex: document.getElementById("bg-hex"),
+      swap: document.getElementById("swap"),
+      presets: document.getElementById("presets"),
+      contrast: document.getElementById("contrast"),
+      size: document.getElementById("size"),
+      sizeValue: document.getElementById("size-value"),
+      ec: document.getElementById("ec"),
+      ecHelp: document.getElementById("ec-help"),
+      stage: document.getElementById("stage"),
+      meta: document.getElementById("meta"),
+      download: document.getElementById("download"),
+      status: document.getElementById("status"),
+      form: document.getElementById("form"),
+    };
+
+    const state = {
+      text: "https://ahmaddroobi99.github.io",
+      fg: "#141210",
+      bg: "#ffffff",
+      size: 320,
+      level: "M",
+      dataUrl: null,
+      error: null,
+    };
+
+    function channel(c) {
+      const s = c / 255;
+      return s <= 0.03928 ? s / 12.92 : ((s + 0.055) / 1.055) ** 2.4;
+    }
+    function hexToRgb(hex) {
+      const raw = hex.replace("#", "");
+      const full = raw.length === 3 ? raw.split("").map((c) => c + c).join("") : raw;
+      if (!/^[0-9a-fA-F]{6}$/.test(full)) return null;
+      const n = parseInt(full, 16);
+      return [(n >> 16) & 255, (n >> 8) & 255, n & 255];
+    }
+    function contrastRatio(a, b) {
+      const A = hexToRgb(a);
+      const B = hexToRgb(b);
+      if (!A || !B) return null;
+      const lum = (rgb) => 0.2126 * channel(rgb[0]) + 0.7152 * channel(rgb[1]) + 0.0722 * channel(rgb[2]);
+      const L1 = lum(A);
+      const L2 = lum(B);
+      const hi = Math.max(L1, L2);
+      const lo = Math.min(L1, L2);
+      return (hi + 0.05) / (lo + 0.05);
+    }
+    function filenameFrom(text) {
+      const slug = text.replace(/^https?:\/\//, "").replace(/[^a-z0-9]+/gi, "-").replace(/^-|-$/g, "").slice(0, 40).toLowerCase();
+      return `qr-${slug || "imprint"}.png`;
+    }
+
+    PRESETS.forEach((preset) => {
+      const btn = document.createElement("button");
+      btn.type = "button";
+      btn.className = "preset";
+      btn.setAttribute("aria-label", `Use ${preset.name} colours, foreground ${preset.fg}, background ${preset.bg}`);
+      btn.innerHTML = `<span class="chip" aria-hidden="true" style="background:linear-gradient(135deg, ${preset.fg} 50%, ${preset.bg} 50%)"></span>${preset.name}`;
+      btn.addEventListener("click", () => {
+        state.fg = preset.fg;
+        state.bg = preset.bg;
+        syncColourInputs();
+        render();
+      });
+      els.presets.appendChild(btn);
+    });
+
+    LEVELS.forEach((item) => {
+      const btn = document.createElement("button");
+      btn.type = "button";
+      btn.dataset.value = item.value;
+      btn.setAttribute("role", "radio");
+      btn.setAttribute("aria-label", `${item.label}, restores ${item.recovery}`);
+      btn.textContent = item.value;
+      btn.addEventListener("click", () => {
+        state.level = item.value;
+        render();
+      });
+      els.ec.appendChild(btn);
+    });
+
+    function syncColourInputs() {
+      els.fg.value = /^#[0-9a-fA-F]{6}$/.test(state.fg) ? state.fg : "#000000";
+      els.bg.value = /^#[0-9a-fA-F]{6}$/.test(state.bg) ? state.bg : "#000000";
+      els.fgHex.value = state.fg;
+      els.bgHex.value = state.bg;
+    }
+
+    function setHex(which, next) {
+      if (!/^#?[0-9a-fA-F]{0,6}$/.test(next)) return;
+      const value = next.startsWith("#") ? next : `#${next}`;
+      state[which] = value;
+      syncColourInputs();
+      render();
+    }
+
+    els.content.value = state.text;
+    els.size.value = String(state.size);
+    syncColourInputs();
+
+    els.content.addEventListener("input", () => {
+      state.text = els.content.value;
+      render();
+    });
+    els.fg.addEventListener("input", () => { state.fg = els.fg.value; els.fgHex.value = state.fg; render(); });
+    els.bg.addEventListener("input", () => { state.bg = els.bg.value; els.bgHex.value = state.bg; render(); });
+    els.fgHex.addEventListener("input", () => setHex("fg", els.fgHex.value));
+    els.bgHex.addEventListener("input", () => setHex("bg", els.bgHex.value));
+    els.swap.addEventListener("click", () => {
+      const tmp = state.fg;
+      state.fg = state.bg;
+      state.bg = tmp;
+      syncColourInputs();
+      render();
+    });
+    els.size.addEventListener("input", () => {
+      state.size = Number(els.size.value);
+      render();
+    });
+    els.form.addEventListener("submit", (event) => {
+      event.preventDefault();
+      download();
+    });
+    els.download.addEventListener("click", download);
+
+    function download() {
+      if (!state.dataUrl || state.error) return;
+      const trimmed = state.text.trim();
+      const link = document.createElement("a");
+      link.href = state.dataUrl;
+      link.download = filenameFrom(trimmed);
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+      els.status.textContent = `Downloaded ${filenameFrom(trimmed)}`;
+    }
+
+    let token = 0;
+    async function render() {
+      const trimmed = state.text.trim();
+      const selected = LEVELS.find((item) => item.value === state.level) || LEVELS[1];
+      els.count.textContent = `${state.text.length} characters`;
+      els.sizeValue.textContent = `${state.size} px`;
+      els.size.setAttribute("aria-valuetext", `${state.size} pixels`);
+      els.meta.textContent = `${state.size} × ${state.size} · ${state.level}`;
+      els.ecHelp.textContent = `${selected.label} restores about ${selected.recovery} of the mark if it is damaged. ${selected.hint}.`;
+      [...els.ec.children].forEach((btn) => {
+        const on = btn.dataset.value === state.level;
+        btn.setAttribute("aria-pressed", on ? "true" : "false");
+        btn.setAttribute("aria-checked", on ? "true" : "false");
+      });
+      const ratio = contrastRatio(state.fg, state.bg);
+      els.contrast.hidden = !(ratio !== null && ratio < 2.5);
+
+      if (!trimmed) {
+        state.dataUrl = null;
+        state.error = null;
+        els.stage.classList.remove("has-mark");
+        els.stage.style.backgroundColor = "";
+        els.stage.innerHTML = `<p id="empty">Type a URL or text to compose a mark.</p>`;
+        els.download.disabled = true;
+        return;
+      }
+
+      const current = ++token;
+      try {
+        const url = await QRCode.toDataURL(trimmed, {
+          errorCorrectionLevel: state.level,
+          width: state.size,
+          margin: 2,
+          color: { dark: state.fg, light: state.bg },
+          type: "image/png",
+        });
+        if (current !== token) return;
+        state.dataUrl = url;
+        state.error = null;
+        els.stage.classList.add("has-mark");
+        els.stage.style.backgroundColor = state.bg;
+        const img = document.createElement("img");
+        img.src = url;
+        img.alt = `QR code for ${trimmed}`;
+        img.className = "qr-mark";
+        els.stage.replaceChildren(img);
+        els.download.disabled = false;
+      } catch {
+        if (current !== token) return;
+        state.dataUrl = null;
+        state.error = "too-long";
+        els.stage.classList.remove("has-mark");
+        els.stage.style.backgroundColor = "";
+        els.stage.innerHTML = `<p class="error">Too much content for this error-correction level. Shorten the text or choose a lower level.</p>`;
+        els.download.disabled = true;
+      }
+    }
+
+    render();
+  </script>
+</body>
+</html>
