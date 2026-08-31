@@ -1,0 +1,272 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>GitHub audit — Ahmad Droobi</title>
+    <meta name="theme-color" content="#12110e" />
+    <link rel="icon" type="image/svg+xml" href="./favicon.svg" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:ital,wght@0,400;0,500;0,600;1,400&family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,600;1,6..72,400&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      :root {
+        --bg: #12110e;
+        --bg-2: #1a1915;
+        --surface: #1c1b16;
+        --surface-2: #24221c;
+        --fg: #e8e4d9;
+        --ink: #f4f0e6;
+        --muted: #9a9484;
+        --faint: #6f6a5e;
+        --brass: #c4a35a;
+        --brass-dim: #8a7340;
+        --line: #2c2a24;
+        --ok: #7d9a6c;
+      }
+      * { box-sizing: border-box; }
+      html { -webkit-font-smoothing: antialiased; }
+      body {
+        margin: 0;
+        background: var(--bg);
+        color: var(--fg);
+        font-family: "IBM Plex Sans", system-ui, sans-serif;
+        line-height: 1.5;
+      }
+      h1, h2, h3 { font-family: Newsreader, Georgia, serif; font-weight: 400; color: var(--ink); text-wrap: balance; }
+      a { color: var(--brass); text-decoration: none; }
+      a:hover { text-decoration: underline; }
+      .wrap { max-width: 72rem; margin: 0 auto; padding: 0 1.25rem; }
+      header { border-bottom: 1px solid var(--line); padding: 2.5rem 0 2rem; }
+      header .row { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 1.5rem; align-items: end; }
+      .eyebrow { font-family: "IBM Plex Mono", monospace; font-size: 0.7rem; letter-spacing: 0.22em; text-transform: uppercase; color: var(--brass); }
+      h1 { font-size: clamp(2rem, 5vw, 3rem); line-height: 1.1; margin: 0.75rem 0 0; }
+      .lede { max-width: 36rem; color: var(--muted); margin: 1rem 0 0; font-size: 0.95rem; }
+      .stats { display: grid; grid-template-columns: repeat(2, 1fr); gap: 0.75rem; padding: 2rem 0; }
+      @media (min-width: 800px) { .stats { grid-template-columns: repeat(4, 1fr); } }
+      .card { background: var(--surface); border: 1px solid var(--line); border-radius: 0.5rem; }
+      .stat { padding: 1rem 1.25rem; }
+      .stat kbd { font-family: "IBM Plex Mono", monospace; font-size: 0.65rem; letter-spacing: 0.18em; text-transform: uppercase; color: var(--faint); }
+      .stat b { display: block; font-family: Newsreader, serif; font-size: 1.85rem; font-weight: 400; color: var(--ink); margin-top: 0.35rem; font-variant-numeric: tabular-nums; }
+      .stat span { font-size: 0.75rem; color: var(--muted); }
+      .idgrid { display: grid; gap: 1.5rem; padding-bottom: 2.5rem; }
+      @media (min-width: 900px) { .idgrid { grid-template-columns: 1.2fr 0.8fr; } }
+      .card-inner { padding: 1.5rem; }
+      .links { display: flex; flex-wrap: wrap; gap: 0.75rem 1.25rem; margin-top: 1.25rem; font-family: "IBM Plex Mono", monospace; font-size: 0.75rem; }
+      .showcase { display: grid; gap: 1rem; padding-bottom: 3rem; }
+      @media (min-width: 700px) { .showcase { grid-template-columns: 1fr 1fr; } }
+      .shot { width: 100%; aspect-ratio: 16/9; object-fit: cover; object-position: top; display: block; background: var(--bg-2); }
+      .mono { font-family: "IBM Plex Mono", monospace; }
+      .chips { display: flex; flex-wrap: wrap; gap: 0.5rem; margin: 1rem 0 1.25rem; }
+      .chips button {
+        height: 2.5rem; padding: 0 0.9rem; border-radius: 999px; border: 1px solid var(--line);
+        background: var(--surface); color: var(--muted); font-family: "IBM Plex Mono", monospace; font-size: 0.7rem;
+        cursor: pointer;
+      }
+      .chips button.on { background: var(--brass); color: var(--bg); border-color: var(--brass); }
+      input[type="search"] {
+        width: 100%; height: 2.75rem; border-radius: 0.4rem; border: 1px solid var(--line);
+        background: var(--surface); color: var(--fg); padding: 0 0.9rem; font: inherit; outline: none;
+      }
+      input[type="search"]:focus { border-color: var(--brass-dim); }
+      table { width: 100%; border-collapse: collapse; font-size: 0.9rem; }
+      th { text-align: left; font-family: "IBM Plex Mono", monospace; font-size: 0.65rem; letter-spacing: 0.16em; text-transform: uppercase; color: var(--faint); font-weight: 400; padding: 0.6rem 1rem; border-bottom: 1px solid var(--line); }
+      td { padding: 0.7rem 1rem; border-bottom: 1px solid var(--line); vertical-align: top; }
+      td.name a { color: var(--ink); font-weight: 500; }
+      td.name a:hover { color: var(--brass); }
+      .faint { color: var(--faint); font-size: 0.7rem; }
+      .brass { color: var(--brass); }
+      footer { padding: 2.5rem 0 3.5rem; color: var(--faint); font-family: "IBM Plex Mono", monospace; font-size: 0.7rem; }
+      ul.plain { margin: 0.75rem 0 0; padding: 0; list-style: none; }
+      ul.plain li { color: var(--muted); font-size: 0.9rem; margin: 0.4rem 0; }
+    </style>
+  </head>
+  <body>
+    <header>
+      <div class="wrap row">
+        <div>
+          <p class="eyebrow">Public account ledger</p>
+          <h1>Sorted by project, not by last push.</h1>
+          <p class="lede">
+            Ahmad Droobi — scientific ML, data assimilation, perception systems.
+            Private thesis sources are counted, not listed.
+          </p>
+        </div>
+        <div class="mono" style="font-size:0.75rem;color:var(--muted);text-align:right">
+          <a href="https://www.linkedin.com/in/droobi7/">linkedin.com/in/droobi7</a><br />
+          <a href="https://github.com/ahmaddroobi99">github.com/ahmaddroobi99</a>
+        </div>
+      </div>
+    </header>
+
+    <div class="wrap">
+      <section class="stats" id="stats"></section>
+      <section class="idgrid">
+        <div class="card card-inner">
+          <p class="eyebrow">Current identity</p>
+          <h2 style="margin:0.5rem 0 0;font-size:1.85rem">Ahmad Droobi</h2>
+          <p style="color:var(--muted);margin:0.4rem 0 0">Engineer — scientific ML, data assimilation, perception systems</p>
+          <p style="color:var(--muted);margin:0.2rem 0 0">MSc 2025, University of Calgary (completed)</p>
+          <p style="margin:1rem 0 0">Data-Driven Filtering Techniques for Turbulent Flow Models (A Lagrangian Data Assimilation Approach)</p>
+          <p style="color:var(--muted);margin:0.4rem 0 0">BSc Computer Engineering, An-Najah National University, 2023</p>
+          <div class="links">
+            <a href="https://www.linkedin.com/in/droobi7/">LinkedIn</a>
+            <a href="https://ucalgary.scholaris.ca/items/b4a3d3b9-4fbf-4d1e-8e1e-80c71c009825">Thesis</a>
+            <a href="https://scholar.google.com/citations?user=H-3pF00AAAAJ">Scholar</a>
+            <a href="https://ahmaddroobi99.github.io/">Portfolio</a>
+            <a href="https://github.com/ahmaddroobi99/projects">Project index</a>
+          </div>
+        </div>
+        <div class="card card-inner">
+          <p class="eyebrow">What this report contains</p>
+          <ul class="plain">
+            <li>Public original work grouped into five projects.</li>
+            <li>Live captures from deployed sites — not mock GIFs.</li>
+            <li>114 private repositories counted, not named (including thesis sources).</li>
+            <li>Unused forks and empty stubs archived on the account.</li>
+          </ul>
+        </div>
+      </section>
+
+      <p class="eyebrow">Featured</p>
+      <h2 style="margin:0.35rem 0 1rem">What a hiring manager should open</h2>
+      <section class="showcase" id="showcase"></section>
+
+      <p class="eyebrow">Ledger</p>
+      <h2 style="margin:0.35rem 0 1rem">Every public repository, by project</h2>
+      <input type="search" id="q" placeholder="Filter by name, language, project" />
+      <div class="chips" id="chips"></div>
+      <div class="card" style="overflow:auto;margin-bottom:3rem">
+        <table>
+          <thead>
+            <tr>
+              <th>Repository</th>
+              <th>Project</th>
+              <th>Action</th>
+              <th>Why</th>
+            </tr>
+          </thead>
+          <tbody id="rows"></tbody>
+        </table>
+      </div>
+      <footer>
+        Generated 31 Aug 2026 · Private research never published in this ledger ·
+        <a href="https://github.com/ahmaddroobi99/github-audit">Source</a>
+      </footer>
+    </div>
+    <script>
+      const LABELS = {
+        research: "Research",
+        perception: "Perception",
+        intelligence: "Intelligence",
+        products: "Products",
+        experiments: "Experiments",
+        coursework: "Coursework",
+        "fork-reference": "Forks",
+        archived: "Archived",
+        other: "Other",
+      };
+      const ORDER = Object.keys(LABELS);
+      let data = { repos: [], totals: {}, showcase: [] };
+      let chip = "all";
+
+      function shotSrc(path) {
+        if (!path) return null;
+        return path.replace("/audit/", "./");
+      }
+
+      function render() {
+        const t = data.totals || {};
+        document.getElementById("stats").innerHTML = [
+          ["Inventoried", t.all, t.public + " public · " + t.private + " private"],
+          ["Listed here", t.public_listed, "public names only"],
+          ["Archived (public)", t.archived_public, "forks and stubs"],
+          ["Research locked", t.research_protected, t.private_research_hidden + " private, unnamed"],
+        ]
+          .map(
+            ([k, v, h]) =>
+              `<div class="card stat"><kbd>${k}</kbd><b>${v ?? "—"}</b><span>${h}</span></div>`
+          )
+          .join("");
+
+        document.getElementById("showcase").innerHTML = (data.showcase || [])
+          .map((s) => {
+            const img = shotSrc(s.shot);
+            return `<article class="card overflow-hidden">
+              ${img ? `<img class="shot" src="${img}" alt="Live capture of ${s.name}" />` : ""}
+              <div class="card-inner">
+                <h3 style="margin:0;font-size:1.25rem"><a href="https://github.com/ahmaddroobi99/${s.name}">${s.name}</a></h3>
+                <p style="color:var(--muted);margin:0.5rem 0 0">${s.blurb}</p>
+                <p class="faint" style="margin:0.6rem 0 0">${s.tech || ""}</p>
+                ${s.live ? `<p style="margin:0.6rem 0 0"><a href="${s.live}">Live demo</a></p>` : ""}
+              </div>
+            </article>`;
+          })
+          .join("");
+
+        const chips = ["all", ...ORDER];
+        document.getElementById("chips").innerHTML = chips
+          .map((id) => {
+            const label = id === "all" ? "All" : LABELS[id];
+            return `<button type="button" data-id="${id}" class="${chip === id ? "on" : ""}">${label}</button>`;
+          })
+          .join("");
+        document.querySelectorAll("#chips button").forEach((b) => {
+          b.onclick = () => {
+            chip = b.dataset.id;
+            paintRows();
+            renderChipsOnly();
+          };
+        });
+        paintRows();
+      }
+
+      function renderChipsOnly() {
+        document.querySelectorAll("#chips button").forEach((b) => {
+          b.classList.toggle("on", b.dataset.id === chip);
+        });
+      }
+
+      function paintRows() {
+        const q = (document.getElementById("q").value || "").toLowerCase();
+        const rows = (data.repos || [])
+          .filter((r) => {
+            if (chip !== "all" && r.domain !== chip) return false;
+            if (!q) return true;
+            return (
+              r.name.toLowerCase().includes(q) ||
+              (r.language || "").toLowerCase().includes(q) ||
+              (r.reason || "").toLowerCase().includes(q) ||
+              (r.domain || "").includes(q)
+            );
+          })
+          .sort((a, b) => {
+            const da = ORDER.indexOf(a.domain);
+            const db = ORDER.indexOf(b.domain);
+            if (da !== db) return da - db;
+            return a.name.localeCompare(b.name);
+          });
+        document.getElementById("rows").innerHTML = rows
+          .map(
+            (r) => `<tr>
+              <td class="name"><a href="${r.url}">${r.name}</a><div class="faint">${r.language || "—"} ${r.fork ? "· fork" : ""}</div></td>
+              <td class="brass mono" style="font-size:0.7rem">${LABELS[r.domain] || r.domain}</td>
+              <td class="mono faint">${r.action}</td>
+              <td style="color:var(--muted)">${r.reason || ""}</td>
+            </tr>`
+          )
+          .join("");
+      }
+
+      document.getElementById("q").addEventListener("input", paintRows);
+      fetch("./report.json")
+        .then((r) => r.json())
+        .then((j) => {
+          data = j;
+          render();
+        });
+    </script>
+  </body>
+</html>
