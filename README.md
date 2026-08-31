@@ -13,3 +13,8 @@ LinkedIn: [linkedin.com/in/droobi7](https://www.linkedin.com/in/droobi7/)
 - [engineering-portfolio](https://github.com/ahmaddroobi99/engineering-portfolio)
 - [qg-lada-lab](https://github.com/ahmaddroobi99/qg-lada-lab)
 - [ai-perception-lab](https://github.com/ahmaddroobi99/ai-perception-lab)
+
+---
+
+Account grouping: research first, undergraduate last — see the [profile README](https://github.com/ahmaddroobi99/ahmaddroobi99). GitHub cannot custom-sort the Repositories tab.
+
