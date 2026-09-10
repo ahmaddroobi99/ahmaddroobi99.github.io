@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>VLA Drive Sim</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <div class="app">
+    <header class="topbar">
+      <div>
+        <p class="kicker">Vision Language Action</p>
+        <h1>VLA Drive Sim</h1>
+      </div>
+      <p class="lede">Camera patches and a language instruction enter one transformer. The policy outputs steer, throttle, and brake on a forked road.</p>
+    </header>
+    <section class="stack">
+      <article class="panel camera-panel">
+        <header><span>camera</span><span class="meta" id="patchLabel">patch 4/9</span></header>
+        <canvas id="cam" width="280" height="220"></canvas>
+        <div class="patches" id="patches"></div>
+        <p class="hint">vision tokens</p>
+      </article>
+      <article class="panel xform-panel">
+        <header><span>one transformer</span><span class="meta">ACT style chunk</span></header>
+        <div class="tokens" id="tokens"></div>
+        <div class="actions">
+          <div class="act"><label>steer <strong id="steerTxt">+0.0°</strong></label><div class="bar"><i id="steerBar"></i></div></div>
+          <div class="act"><label>throttle <strong id="thrTxt">0.00</strong></label><div class="bar"><i id="thrBar"></i></div></div>
+          <div class="act"><label>brake <strong id="brkTxt">0.00</strong></label><div class="bar"><i id="brkBar"></i></div></div>
+        </div>
+        <p class="hint">actions drive the car</p>
+      </article>
+      <article class="panel inst-panel">
+        <header><span>instruction</span><span class="meta" id="confLabel">confidence 0.00</span></header>
+        <blockquote id="instText">take the second exit</blockquote>
+        <div class="chips" id="chips"></div>
+        <div class="conf"><i id="confBar"></i></div>
+        <p class="hint">text tokens</p>
+      </article>
+    </section>
+    <section class="world-wrap">
+      <canvas id="world" width="1100" height="420"></canvas>
+      <div class="hud">
+        <span id="speedHud">v = 0.0 km/h</span>
+        <span id="steerHud">steer +0.0°</span>
+        <span id="modeHud">AUTO</span>
+      </div>
+    </section>
+    <section class="controls">
+      <button id="btnPlay" class="primary">Pause</button>
+      <button id="btnReset">Reset</button>
+      <label class="toggle"><input type="checkbox" id="manual" /> Manual WASD</label>
+      <span class="keys">W throttle · S brake · A/D steer · R reset</span>
+    </section>
+    <footer>
+      <p>Pedagogical policy. Language picks a path, vision estimates lane offset, a PD controller emits action chunks.</p>
+      <p><a href="https://github.com/ahmaddroobi99/vla-drive-sim">Source on GitHub</a></p>
+    </footer>
+  </div>
+  <script src="world.js"></script>
+  <script src="policy.js"></script>
+  <script src="sim.js"></script>
+</body>
+</html>
