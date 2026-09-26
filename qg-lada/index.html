@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>QG-LaDA: Reconstructing Quasi-Geostrophic Streamfunction from Lagrangian Drifters</title>
+<meta name="description" content="Public companion to Ahmad Droobi's 2025 MSc thesis. Spectral QG twin and localized EnKF reconstruct Eulerian streamfunction from Lagrangian drifters." />
+<meta property="og:title" content="QG-LaDA" />
+<meta property="og:description" content="Reconstructing quasi-geostrophic streamfunction from Lagrangian drifters." />
+<meta property="og:image" content="https://raw.githubusercontent.com/ahmaddroobi99/qg-lada-lab/main/docs/demo.png" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Source+Serif+4:opsz,wght@8..60,600&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css" />
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js"
+  onload="renderMathInElement(document.body,{delimiters:[{left:'$$',right:'$$',display:true},{left:'$',right:'$',display:false}]});"></script>
+<style>
+:root {
+  --ink: #1a1a1a;
+  --muted: #5b6570;
+  --line: #e6e8eb;
+  --paper: #ffffff;
+  --wash: #f6f7f9;
+  --accent: #367dbd;
+  --accent-soft: #e8f1f8;
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; padding: 0; }
+body {
+  font-family: Inter, "Helvetica Neue", Arial, sans-serif;
+  color: var(--ink);
+  background: linear-gradient(#fff, var(--wash));
+  line-height: 1.65;
+}
+.wrap { max-width: 900px; margin: 0 auto; padding: 56px 22px 80px; }
+h1 {
+  font-size: clamp(1.55rem, 3.2vw, 2.15rem);
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  line-height: 1.25;
+  text-align: center;
+  margin: 0 0 18px;
+}
+.acronym {
+  text-align: center;
+  font-family: "Source Serif 4", Georgia, serif;
+  font-size: clamp(1.05rem, 2.2vw, 1.35rem);
+  line-height: 1.55;
+  margin: 0 0 14px;
+  color: #243040;
+}
+.acronym b { color: var(--accent); font-weight: 700; }
+.venue {
+  text-align: center;
+  font-size: 0.92rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin: 0 0 18px;
+}
+.authors, .affil { text-align: center; margin: 0 0 8px; }
+.authors a { color: var(--accent); text-decoration: none; font-weight: 600; }
+.authors a:hover { text-decoration: underline; }
+sup { font-size: 0.7em; color: var(--muted); }
+.affil { color: var(--muted); font-size: 0.95rem; }
+.pills {
+  display: flex; flex-wrap: wrap; justify-content: center; gap: 8px;
+  margin: 22px 0 36px;
+}
+.pills a {
+  display: inline-block;
+  padding: 7px 14px;
+  border: 1px solid #c9d7e6;
+  border-radius: 999px;
+  color: var(--accent);
+  text-decoration: none;
+  font-size: 0.88rem;
+  font-weight: 600;
+  background: #fff;
+}
+.pills a:hover { background: var(--accent-soft); }
+figure { margin: 0 0 18px; }
+figure img, figure video {
+  width: 100%; display: block; border-radius: 10px;
+  border: 1px solid var(--line); background: #111;
+}
+figcaption { color: var(--muted); font-size: 0.86rem; margin-top: 8px; text-align: center; }
+h2 {
+  font-size: 1.35rem;
+  margin: 42px 0 12px;
+  padding-top: 8px;
+  border-top: 1px solid var(--line);
+}
+ul { padding-left: 1.15rem; }
+li { margin: 0.4rem 0; }
+.abstract, p { color: #222; }
+table { width: 100%; border-collapse: collapse; font-size: 0.95rem; }
+th, td { border-bottom: 1px solid var(--line); text-align: left; padding: 8px 10px; }
+th { color: var(--muted); font-weight: 600; font-size: 0.82rem; text-transform: uppercase; letter-spacing: 0.04em; }
+pre {
+  background: #1e2430;
+  color: #e8eef6;
+  padding: 16px 18px;
+  border-radius: 10px;
+  overflow-x: auto;
+  font-size: 0.84rem;
+  line-height: 1.5;
+}
+.eq {
+  background: var(--wash);
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  padding: 14px 16px;
+  overflow-x: auto;
+}
+.note { color: var(--muted); font-size: 0.9rem; }
+footer { margin-top: 48px; color: var(--muted); font-size: 0.82rem; text-align: center; }
+</style>
+</head>
+<body>
+<main class="wrap">
+  <h1>QG-LaDA: Reconstructing Quasi-Geostrophic Streamfunction from Lagrangian Drifters</h1>
+  <p class="acronym">
+    <b>Q</b> <b>G</b>-<b>L</b> <b>A</b> <b>D</b> <b>A</b>:<br />
+    <b>Q</b>uasi-<b>G</b>eostrophic <b>L</b>agrangian <b>A</b>ssimilation of <b>D</b>rifter <b>A</b>bservations
+  </p>
+  <p class="venue">MSc Thesis &middot; University of Calgary &middot; 2025</p>
+  <p class="authors"><a href="https://github.com/ahmaddroobi99">Ahmad Droobi</a><sup>1</sup></p>
+  <p class="affil"><sup>1</sup> Schulich School of Engineering, University of Calgary<br />Advisor: Mustafa Mohamad</p>
+  <nav class="pills">
+    <a href="https://ucalgary.scholaris.ca/items/b4a3d3b9-4fbf-4d1e-8e1e-80c71c009825">Thesis</a>
+    <a href="https://github.com/ahmaddroobi99/qg-lada-lab">Code</a>
+    <a href="https://qg-lada-lab.netlify.app/">Live Lab</a>
+    <a href="https://qg-lada-lab.netlify.app/simulate">Simulate</a>
+    <a href="https://qg-lada-lab.netlify.app/methods">Methods</a>
+    <a href="https://qg-lada-lab.netlify.app/results">Results</a>
+    <a href="#bibtex">BibTeX</a>
+  </nav>
+
+  <h2>Poster</h2>
+  <figure>
+    <img src="https://raw.githubusercontent.com/ahmaddroobi99/qg-lada-lab/main/docs/demo.png" alt="QG-LaDA live lab screenshot: truth, WHERE EnKF, and hybrid streamfunction panels with drifters" />
+    <figcaption>Identical-twin lab. Truth, WHERE EnKF, and hybrid EnKF&ndash;PF reconstructions of $\psi$ from 40 drifters.</figcaption>
+  </figure>
+
+  <h2>Video</h2>
+  <figure>
+    <img src="https://raw.githubusercontent.com/ahmaddroobi99/qg-lada-lab/main/public/media/psi_compare.gif" alt="Animated comparison of truth, WHERE, and hybrid streamfunction" />
+    <figcaption>Truth vs WHERE vs hybrid. Black markers are Lagrangian tracers.</figcaption>
+  </figure>
+
+  <h2>TL;DR</h2>
+  <ul>
+    <li>Public identical-twin lab that recovers an <strong>Eulerian streamfunction $\psi$ from noisy Lagrangian velocities</strong> at 40 drifters.</li>
+    <li><strong>Spectral barotropic QG twin</strong> plus a localized stochastic EnKF (WHERE, thesis Algorithm 5), with an optional hybrid EnKF&ndash;PF branch (Algorithms 8&ndash;9).</li>
+    <li>Helmholtz inversion $\hat{\psi} = -\hat{q}/(\kappa^2 + \mu)$; every PDE term and filter knob is live in the browser.</li>
+    <li>Committed $N=32$ Python run: WHERE XCOR <strong>0.964</strong> vs free-run <strong>0.316</strong>. Demo-scale, not thesis Table 10.1.</li>
+  </ul>
+
+  <h2>Abstract</h2>
+  <p class="abstract">This work contributes to the understanding of high-dimensional fluid flows, focusing on quasi-geostrophic systems, by reconstructing turbulent flow fields from a partial, noisy, time-sequential set of tracer measurements. Lagrangian drifters stream local velocity rather than a gridded streamfunction; the inverse problem is to recover $\psi$ from those tracks. A spectral quasi-geostrophic twin generates truth and a forecast ensemble. Helmholtz inversion maps vorticity to streamfunction. A localized stochastic Ensemble Kalman Filter (WHERE) assimilates the noisy velocities, with an optional hybrid EnKF&ndash;particle-filter branch. The public lab is a runnable companion to the University of Calgary MSc thesis <em>Data-driven filtering techniques for turbulent flow models (a Lagrangian data assimilation approach)</em> (Droobi, 2025).</p>
+
+  <h2>Method</h2>
+  <h3>1. Initialization</h3>
+  <p>A spectral barotropic QG model on a periodic $[0, 2\pi]^2$ $\beta$-plane produces the truth and the forecast ensemble. Forty drifters sit on a jittered lattice and observe noisy velocities ($\sigma_o = 0.04$). Streamfunction is recovered from vorticity by Helmholtz inversion.</p>
+  <div class="eq">
+    $$\partial_t q + J(\psi, q) + \beta \partial_x \psi = F - d q - \nu (-\nabla^2)^p q$$
+    $$q = \nabla^2 \psi - \mu \psi, \qquad \hat{\psi} = -\hat{q}/(\kappa^2 + \mu)$$
+  </div>
+
+  <h3>2. Localized analysis</h3>
+  <p>WHERE is a stochastic EnKF on vorticity. Predicted velocities at the truth tracer sites form the observation operator. Gaspari&ndash;Cohn localization ($L_{\mathrm{loc}} = 1.55$) tapers the sample covariances; multiplicative inflation $\alpha = 1.08$ keeps the ensemble from collapsing. Analysis interval is $0.35$ time units on the committed run ($N_e = 24$).</p>
+
+  <h3>3. Hybrid refinement</h3>
+  <p>After the EnKF update, members can be reweighted by the Gaussian velocity likelihood and resampled when the effective sample size drops below $0.55\,N_e$. A $1.5\%$ jitter restores sample covariance after cloning. On this QG twin the hybrid matches large-scale correlation but does not beat WHERE on RMSE.</p>
+
+  <h2>Results</h2>
+  <p class="note">Committed identical-twin Python run, $N = 32$, $N_e = 24$, $40$ tracers, $t_{\mathrm{end}} = 28$. Not a production forecast score and not thesis Table 10.1 (different resolution and horizon).</p>
+  <table>
+    <thead><tr><th>Filter</th><th>XCOR</th><th>RMSE</th><th>Note</th></tr></thead>
+    <tbody>
+      <tr><td>WHERE EnKF</td><td>0.964</td><td>0.256</td><td>clears XCOR target &gt; 0.9</td></tr>
+      <tr><td>Hybrid EnKF&ndash;PF</td><td>0.945</td><td>0.367</td><td>smoother; worse small-scale RMSE</td></tr>
+      <tr><td>Free run (no DA)</td><td>0.316</td><td>0.960</td><td>phase lost within a few eddy turnovers</td></tr>
+    </tbody>
+  </table>
+  <figure>
+    <img src="https://raw.githubusercontent.com/ahmaddroobi99/qg-lada-lab/main/public/media/psi_free.gif" alt="WHERE versus free-run streamfunction" />
+    <figcaption>WHERE holds the gyre. The free run loses phase.</figcaption>
+  </figure>
+
+  <h2 id="bibtex">BibTeX</h2>
+  <pre>@mastersthesis{droobi2025lada,
+  title   = {Data-Driven Filtering Techniques for Turbulent Flow Models
+             (A Lagrangian Data Assimilation Approach)},
+  author  = {Droobi, Ahmad},
+  school  = {University of Calgary},
+  year    = {2025},
+  doi     = {10.11575/PRISM/49934},
+  url     = {https://hdl.handle.net/1880/122341}
+}</pre>
+
+  <footer>
+    Page theme follows <a href="https://lxxue.github.io/RHINO/">RHINO</a> (Xue et al., CVPR 2026).<br />
+    Lab code: <a href="https://github.com/ahmaddroobi99/qg-lada-lab">ahmaddroobi99/qg-lada-lab</a>.
+    Thesis text remains under University of Calgary deposit terms.
+  </footer>
+</main>
+</body>
+</html>
