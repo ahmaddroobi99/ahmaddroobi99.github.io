@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Local AI: Running Chat, Vision, Speech and Image Models on a CPU-Only Laptop</title>
+<meta name="description" content="Laptop-scale on-device multimodal stack: Qwen2.5, Qwen2.5-VL, SD-Turbo, Whisper and Piper on a CPU-only machine, with 23 teaching guides." />
+<meta property="og:title" content="Local AI" />
+<meta property="og:description" content="Running chat, vision, speech and image models on a CPU-only laptop." />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Source+Serif+4:opsz,wght@8..60,600&display=swap" rel="stylesheet" />
+<style>
+:root {
+  --ink: #1a1a1a;
+  --muted: #5b6570;
+  --line: #e6e8eb;
+  --paper: #ffffff;
+  --wash: #f6f7f9;
+  --accent: #367dbd;
+  --accent-soft: #e8f1f8;
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; padding: 0; }
+body {
+  font-family: Inter, "Helvetica Neue", Arial, sans-serif;
+  color: var(--ink);
+  background: linear-gradient(#fff, var(--wash));
+  line-height: 1.65;
+}
+.wrap { max-width: 900px; margin: 0 auto; padding: 56px 22px 80px; }
+h1 {
+  font-size: clamp(1.55rem, 3.2vw, 2.15rem);
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  line-height: 1.25;
+  text-align: center;
+  margin: 0 0 18px;
+}
+.acronym {
+  text-align: center;
+  font-family: "Source Serif 4", Georgia, serif;
+  font-size: clamp(1.05rem, 2.2vw, 1.35rem);
+  line-height: 1.55;
+  margin: 0 0 14px;
+  color: #243040;
+}
+.acronym b { color: var(--accent); font-weight: 700; }
+.venue {
+  text-align: center;
+  font-size: 0.92rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin: 0 0 18px;
+}
+.authors, .affil { text-align: center; margin: 0 0 8px; }
+.authors a { color: var(--accent); text-decoration: none; font-weight: 600; }
+.authors a:hover { text-decoration: underline; }
+sup { font-size: 0.7em; color: var(--muted); }
+.affil { color: var(--muted); font-size: 0.95rem; }
+.pills {
+  display: flex; flex-wrap: wrap; justify-content: center; gap: 8px;
+  margin: 22px 0 36px;
+}
+.pills a {
+  display: inline-block;
+  padding: 7px 14px;
+  border: 1px solid #c9d7e6;
+  border-radius: 999px;
+  color: var(--accent);
+  text-decoration: none;
+  font-size: 0.88rem;
+  font-weight: 600;
+  background: #fff;
+}
+.pills a:hover { background: var(--accent-soft); }
+figure { margin: 0 0 18px; }
+figure svg, .arch {
+  width: 100%; display: block; border-radius: 10px;
+  border: 1px solid var(--line); background: #111827;
+}
+figcaption { color: var(--muted); font-size: 0.86rem; margin-top: 8px; text-align: center; }
+h2 {
+  font-size: 1.35rem;
+  margin: 42px 0 12px;
+  padding-top: 8px;
+  border-top: 1px solid var(--line);
+}
+h3 { font-size: 1.05rem; margin: 22px 0 8px; }
+ul { padding-left: 1.15rem; }
+li { margin: 0.4rem 0; }
+.abstract, p { color: #222; }
+table { width: 100%; border-collapse: collapse; font-size: 0.95rem; }
+th, td { border-bottom: 1px solid var(--line); text-align: left; padding: 8px 10px; }
+th { color: var(--muted); font-weight: 600; font-size: 0.82rem; text-transform: uppercase; letter-spacing: 0.04em; }
+pre {
+  background: #1e2430;
+  color: #e8eef6;
+  padding: 16px 18px;
+  border-radius: 10px;
+  overflow-x: auto;
+  font-size: 0.84rem;
+  line-height: 1.5;
+}
+.eq {
+  background: var(--wash);
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  padding: 14px 16px;
+  overflow-x: auto;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: 0.86rem;
+  color: #243040;
+  white-space: pre-wrap;
+}
+.note { color: var(--muted); font-size: 0.9rem; }
+.grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+@media (max-width: 720px) { .grid { grid-template-columns: 1fr; } }
+.mock {
+  border: 1px solid #1f2937;
+  background: #0b1220;
+  color: #e5e7eb;
+  border-radius: 10px;
+  padding: 16px 16px 14px;
+  min-height: 210px;
+  font-size: 0.82rem;
+}
+.mock .top { display: flex; justify-content: space-between; color: #93c5fd; font-weight: 600; margin-bottom: 10px; }
+.mock .chip { display: inline-block; border: 1px solid #334155; border-radius: 999px; padding: 2px 8px; margin: 0 6px 6px 0; color: #cbd5e1; }
+.mock .ok { color: #34d399; }
+.mock p { color: #d1d5db; margin: 0 0 8px; }
+footer { margin-top: 48px; color: var(--muted); font-size: 0.82rem; text-align: center; }
+footer a { color: var(--accent); text-decoration: none; }
+</style>
+</head>
+<body>
+<main class="wrap">
+  <h1>Local AI: Running Chat, Vision, Speech and Image Models on a CPU-Only Laptop</h1>
+  <p class="acronym">
+    <b>L</b> <b>O</b> <b>C</b> <b>A</b> <b>L</b>-<b>A</b><b>I</b>:<br />
+    <b>L</b>aptop <b>O</b>n-device <b>C</b>ompute for <b>A</b>udio, <b>L</b>anguage and <b>I</b>mage models
+  </p>
+  <p class="venue">Research Lab &middot; 2026</p>
+  <p class="authors"><a href="https://ahmaddroobi99.github.io/">Ahmad Droobi</a><sup>1</sup></p>
+  <p class="affil"><sup>1</sup> Schulich School of Engineering, University of Calgary</p>
+  <nav class="pills">
+    <a href="https://github.com/ahmaddroobi99/local-ai">Code</a>
+    <a href="https://github.com/ahmaddroobi99/local-ai-lab">Project page source</a>
+    <a href="#method">Method</a>
+    <a href="#results">Results</a>
+    <a href="#guides">Guides</a>
+    <a href="#bibtex">BibTeX</a>
+  </nav>
+
+  <h2>Poster</h2>
+  <figure>
+    <svg class="arch" viewBox="0 0 900 420" role="img" aria-label="Local AI system architecture">
+      <rect width="900" height="420" fill="#111827"/>
+      <text x="450" y="36" text-anchor="middle" fill="#93c5fd" font-family="Inter, Arial" font-size="16" font-weight="700">LOCAL AI SYSTEM</text>
+      <rect x="40" y="58" width="820" height="70" rx="10" fill="#1f2937" stroke="#334155"/>
+      <text x="450" y="88" text-anchor="middle" fill="#e5e7eb" font-family="Inter, Arial" font-size="15" font-weight="600">Browser &middot; static/index.html</text>
+      <text x="450" y="110" text-anchor="middle" fill="#9ca3af" font-family="Inter, Arial" font-size="12">chat &middot; image questions &middot; create image &middot; dictation &middot; voice</text>
+      <rect x="40" y="150" width="820" height="70" rx="10" fill="#1e3a5f" stroke="#367dbd"/>
+      <text x="450" y="180" text-anchor="middle" fill="#e5e7eb" font-family="Inter, Arial" font-size="15" font-weight="600">Server &middot; app.py FastAPI on 127.0.0.1:8765</text>
+      <text x="450" y="202" text-anchor="middle" fill="#bfdbfe" font-family="Inter, Arial" font-size="12">health &middot; NDJSON streaming &middot; locks &middot; on-demand downloads</text>
+      <rect x="40" y="244" width="260" height="96" rx="10" fill="#1f2937" stroke="#334155"/>
+      <text x="170" y="276" text-anchor="middle" fill="#93c5fd" font-family="Inter, Arial" font-size="13" font-weight="700">LLM / VLM</text>
+      <text x="170" y="298" text-anchor="middle" fill="#d1d5db" font-family="Inter, Arial" font-size="12">Qwen2.5 1.5B &middot; Qwen2.5-VL 3B</text>
+      <text x="170" y="318" text-anchor="middle" fill="#9ca3af" font-family="Inter, Arial" font-size="11">llama.cpp &middot; GGUF Q4</text>
+      <rect x="320" y="244" width="260" height="96" rx="10" fill="#1f2937" stroke="#334155"/>
+      <text x="450" y="276" text-anchor="middle" fill="#93c5fd" font-family="Inter, Arial" font-size="13" font-weight="700">Image generation</text>
+      <text x="450" y="298" text-anchor="middle" fill="#d1d5db" font-family="Inter, Arial" font-size="12">SD-Turbo + TAESD</text>
+      <text x="450" y="318" text-anchor="middle" fill="#9ca3af" font-family="Inter, Arial" font-size="11">diffusers / PyTorch CPU</text>
+      <rect x="600" y="244" width="260" height="96" rx="10" fill="#1f2937" stroke="#334155"/>
+      <text x="730" y="276" text-anchor="middle" fill="#93c5fd" font-family="Inter, Arial" font-size="13" font-weight="700">Speech</text>
+      <text x="730" y="298" text-anchor="middle" fill="#d1d5db" font-family="Inter, Arial" font-size="12">Whisper base &middot; Piper</text>
+      <text x="730" y="318" text-anchor="middle" fill="#9ca3af" font-family="Inter, Arial" font-size="11">CTranslate2 &middot; ONNX Runtime</text>
+      <text x="450" y="378" text-anchor="middle" fill="#9ca3af" font-family="Inter, Arial" font-size="12">CPU 8 cores &middot; 7.7 GB RAM &middot; no GPU &middot; models/ from Hugging Face only when you click Download</text>
+      <text x="450" y="400" text-anchor="middle" fill="#6b7280" font-family="Inter, Arial" font-size="11">ModelManager keeps one large model in memory at a time</text>
+    </svg>
+    <figcaption>One browser page and one FastAPI process. Large models share a single RAM slot; speech models stay loaded.</figcaption>
+  </figure>
+
+  <h2>Interface</h2>
+  <div class="grid">
+    <div class="mock">
+      <div class="top"><span>Local AI &middot; chat</span><span class="ok">Ready</span></div>
+      <p>Qwen2.5 1.5B Instruct Q4_K_M on llama.cpp. Replies stream as tokens; speed is shown under each turn.</p>
+      <span class="chip">Engine llama.cpp</span>
+      <span class="chip">1.12 GB</span>
+      <span class="chip">This computer &middot; CPU</span>
+      <p class="ok" style="margin-top:10px">17 tok/s &middot; 4.1 / 7.7 GB RAM &middot; no GPU</p>
+    </div>
+    <div class="mock">
+      <div class="top"><span>Local AI &middot; image</span><span class="ok">SD-Turbo + TAESD</span></div>
+      <p>One-step latent diffusion on CPU. 512&times;512 image in about 30 s; TAESD decodes the latent without a full VAE pass.</p>
+      <span class="chip">diffusers / PyTorch</span>
+      <span class="chip">4.8 GB on disk</span>
+      <span class="chip">5&ndash;6 GB RAM</span>
+      <p class="ok" style="margin-top:10px">Last job 26.8 s &middot; video gated: no discrete GPU</p>
+    </div>
+  </div>
+  <p class="note" style="margin-top:10px;text-align:center">The live app is local-only (127.0.0.1:8765). This page is the public research companion, not the inference server.</p>
+
+  <h2>TL;DR</h2>
+  <ul>
+    <li>A <strong>laptop-local multimodal stack</strong>: chat, image questions, image creation, dictation and a voice assistant, with no cloud and no API key after models are downloaded.</li>
+    <li><strong>One large model in RAM at a time</strong> (ModelManager). Chat, Qwen2.5-VL and SD-Turbo share the slot; Whisper and Piper stay resident.</li>
+    <li>Sized for an ordinary machine: the reference laptop is an <strong>Intel Core i3-N305, 7.7 GB RAM, no graphics card</strong>.</li>
+    <li>Also a lab: one example script per modality, and <strong>23 guides</strong> from a single neuron to transformers to a data center.</li>
+  </ul>
+
+  <h2>Abstract</h2>
+  <p class="abstract">Running modern generative models usually assumes a GPU and a network. This project asks a narrower question: what of chat, vision-language, latent diffusion and speech still fits on a CPU-only laptop with under 8 GB of RAM, and how should the software be arranged so that constraint is visible rather than hidden? Local AI is a single-process FastAPI server and a single-file browser UI. Text and vision-language inference use llama.cpp on 4-bit GGUF weights (Qwen2.5 1.5B Instruct and Qwen2.5-VL 3B). Image generation uses SD-Turbo with a TAESD decoder on CPU PyTorch. Speech uses faster-whisper and Piper. Every feature follows the same six-stage pipeline &mdash; input, preprocess, model, inference, postprocess, output &mdash; so the examples and the 23 guides can point at the same arrows. Weights are fetched from Hugging Face only when the user asks; prompts never leave the machine. Video generation is gated because the hardware profile reports no discrete GPU. Measured on the reference laptop, chat runs at 15&ndash;19 tokens/s, a 512&times;512 image takes about 30 s, and voice chat answers in about 5 s after the end of speech.</p>
+
+  <h2 id="method">Method</h2>
+  <h3>1. Initialization</h3>
+  <p>Double-clicking <code>run.bat</code> creates a virtualenv, installs pinned CPU wheels, and starts <code>app.py</code>. The process checks <code>/api/health</code> so a second launch only reopens the browser. If <code>models/</code> has no GGUF file, the default chat model (1.1 GB) is downloaded once. The chat model is loaded before the first request so the first token is not waiting on disk. Other weights &mdash; Qwen2.5-VL, SD-Turbo, Whisper, Piper &mdash; download only after an explicit Download action.</p>
+
+  <h3>2. Routing and world-frame analogue: one model slot</h3>
+  <p>The browser sends the whole conversation on every turn; the server is stateless. Attachments are resized in a canvas to 448 px JPEG, or a video is folded into a 2&times;2 grid of four frames. A conversation that contains an image is routed to the vision model; otherwise it uses the selected chat GGUF. <code>ModelManager</code> holds at most one large model. Switching between chat, vision and SD-Turbo takes 10&ndash;40 s. Two locks separate the large-model slot from the speech slot, so Piper can speak a sentence while llama.cpp writes the next one.</p>
+
+  <h3>3. Compositional engines and contact with hardware</h3>
+  <p>Each modality has its own engine and its own preprocess:</p>
+  <div class="eq">INPUT &rarr; PREPROCESS &rarr; MODEL &rarr; INFERENCE &rarr; POSTPROCESS &rarr; OUTPUT
+
+TEXT     chat template &rarr; tokens &rarr; transformer &rarr; logits &rarr; sample
+VLM      448 px image &rarr; vision encoder &rarr; projector + LLM
+IMAGE    prompt &rarr; CLIP &rarr; one-step UNet &rarr; TAESD decode
+STT      16 kHz WAV &rarr; log-mel &rarr; Whisper encoder/decoder
+TTS      text &rarr; phonemes &rarr; Piper VITS &rarr; WAV</div>
+  <p><code>fit_context()</code> drops old turns in large chunks so llama.cpp can reuse its prefix cache. Speech endpointing is loudness-based in an AudioWorklet at 16 kHz. <code>hardware.video_gate()</code> refuses video generation on this profile and returns the reason rather than starting a job that cannot finish.</p>
+
+  <h2 id="results">Results</h2>
+  <p class="note">Measurements on the author&rsquo;s laptop: Intel Core i3-N305 (8 cores), 7.7 GB RAM, no GPU. Not a leaderboard score.</p>
+  <table>
+    <thead><tr><th>Task</th><th>Model</th><th>Engine</th><th>Measured</th></tr></thead>
+    <tbody>
+      <tr><td>Chat</td><td>Qwen2.5 1.5B Instruct Q4</td><td>llama.cpp</td><td>0.4&ndash;1.1 s first token &middot; 15&ndash;19 tok/s</td></tr>
+      <tr><td>Image question</td><td>Qwen2.5-VL 3B Q4</td><td>llama.cpp</td><td>~1 min / image</td></tr>
+      <tr><td>Create image</td><td>SD-Turbo + TAESD</td><td>diffusers / PyTorch</td><td>~30 s / 512&times;512</td></tr>
+      <tr><td>Speech &rarr; text</td><td>Whisper base</td><td>CTranslate2</td><td>faster than real time</td></tr>
+      <tr><td>Text &rarr; speech</td><td>Piper (14 voices)</td><td>ONNX Runtime</td><td>~5&times; real time</td></tr>
+      <tr><td>Voice chat turn</td><td>Whisper &rarr; Qwen &rarr; Piper</td><td>all three</td><td>~5 s after end of speech</td></tr>
+      <tr><td>Resident RAM</td><td>chat + voice</td><td>&mdash;</td><td>~1.2 GB</td></tr>
+      <tr><td>Video generation</td><td>&mdash;</td><td>gated</td><td>needs a GPU with &ge; 8 GB</td></tr>
+    </tbody>
+  </table>
+
+  <h2 id="guides">Guides</h2>
+  <p>The repository ships 23 guides that use this code and these measurements. Reading paths:</p>
+  <ul>
+    <li>New to AI: foundations &rarr; neural nets &rarr; attention &rarr; transformers &rarr; LLMs.</li>
+    <li>Using the app: local inference and hardware.</li>
+    <li>Changing the code: system architecture, project structure, Hugging Face, runtime.</li>
+    <li>One modality: LLMs, ViTs, VLMs, image generation, speech, pipelines.</li>
+  </ul>
+
+  <h2 id="bibtex">BibTeX</h2>
+  <pre>@software{droobi2026localai,
+  title        = {Local AI: Running Chat, Vision, Speech and Image
+                  Models on a CPU-Only Laptop},
+  author       = {Droobi, Ahmad},
+  year         = {2026},
+  url          = {https://ahmaddroobi99.github.io/local-ai/},
+  note         = {Research lab and teaching stack}
+}</pre>
+
+  <footer>
+    Page theme follows <a href="https://lxxue.github.io/RHINO/">RHINO</a> (Xue et al., CVPR 2026).<br />
+    Source lab: <a href="https://github.com/ahmaddroobi99/local-ai">ahmaddroobi99/local-ai</a>
+    &middot; Project page: <a href="https://github.com/ahmaddroobi99/local-ai-lab">ahmaddroobi99/local-ai-lab</a>.<br />
+    The inference server is local-only and is not hosted here.
+  </footer>
+</main>
+</body>
+</html>
