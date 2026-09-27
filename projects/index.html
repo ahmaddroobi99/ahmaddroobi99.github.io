@@ -4,7 +4,7 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Projects — Ahmad Droobi</title>
-  <meta name="description" content="Selected public original work: research labs, perception systems, intelligence tools, experiments, coursework, and catalogs." />
+  <meta name="description" content="Categorized public work: research labs, perception systems, intelligence tools, products, experiments, coursework, and catalogs." />
   <meta name="theme-color" content="#1f6f50" />
   <link rel="icon" type="image/svg+xml" href="../favicon.svg" />
   <link href="https://fonts.googleapis.com/css?family=Google+Sans|Noto+Sans|Castoro" rel="stylesheet" />
@@ -17,7 +17,7 @@
       <h1 class="publication-paper-title">Project pages</h1>
       <p class="publication-authors"><a href="https://github.com/ahmaddroobi99">ahmaddroobi99</a></p>
       <p class="publication-affil">Scientific computing · data assimilation · perception systems</p>
-      <p class="publication-venue">Same HTML / CSS / JS language as the Chamelion project page</p>
+      <p class="publication-venue">Chamelion-shaped high-level documentation</p>
       <nav class="publication-links">
         <a href="../">Home</a>
         <a href="https://github.com/ahmaddroobi99">GitHub</a>
@@ -27,7 +27,7 @@
     </div>
   </section>
   <main class="wrap">
-    <p class="lead">Selected from ~300 repositories. Public originals only. Forks, private thesis trees, and empty scaffolds are excluded. Every page states whether the work is original, pedagogical, coursework, an experiment, or a catalog.</p>
+    <p class="lead">Public originals only. Forks, private thesis trees, and empty scaffolds are excluded. Filters cut by domain. Each card states origin: original, extension, reproduction, experiment, coursework, or catalog.</p>
     <div class="filters" role="group" aria-label="Filter projects">
       <button type="button" data-filter="all" aria-pressed="true">All</button>
       <button type="button" data-filter="research">Research</button>
@@ -38,39 +38,77 @@
       <button type="button" data-filter="coursework">Coursework</button>
       <button type="button" data-filter="catalog">Catalogs</button>
     </div>
-    <h2>Featured</h2>
+
+    <h2>Research</h2>
     <div class="grid">
-      <a class="card" data-origin="original" data-domain="research" href="./qg-lada-lab/"><h3>QG-LaDA Lab</h3><p>Spectral QG twin + localized EnKF reconstructs streamfunction from Lagrangian drifters.</p><div class="meta">Original · Research · Live</div></a>
-      <a class="card" data-origin="original" data-domain="perception" href="./axis-vision-pan-tilt/"><h3>AXIS Vision Pan/Tilt</h3><p>Camera error over UART to STM32 STEP/DIR. Software verified. Hardware not bench-tested.</p><div class="meta">Original · Perception · Live</div></a>
-      <a class="card" data-origin="original" data-domain="research" href="./local-wccm/"><h3>local_wccm</h3><p>MATLAB working copy of the barotropic Lagrangian filter used during the MSc.</p><div class="meta">Original · Research</div></a>
-      <a class="card" data-origin="original" data-domain="perception" href="./ai-perception-lab/"><h3>AI Perception Lab</h3><p>Local-first camera workstation. Real in-browser COCO-SSD. Fleet KPIs labeled simulation.</p><div class="meta">Original · Perception</div></a>
-      <a class="card" data-origin="original" data-domain="intelligence" href="./meridian/"><h3>Meridian</h3><p>Research terminal that ranks papers and artifacts by technical depth, not virality.</p><div class="meta">Original · Intelligence · Live</div></a>
-      <a class="card" data-origin="original" data-domain="intelligence" href="./lattice/"><h3>Lattice</h3><p>Visual field manual of machine intelligence, from observation to papers.</p><div class="meta">Original · Intelligence · Live</div></a>
-      <a class="card" data-origin="experiment" data-domain="perception" href="./vla-drive-sim/"><h3>VLA Drive Sim</h3><p>Pedagogical driving loop. Language selects a path; PD emits actions. Not a trained VLA.</p><div class="meta">Experiment · Pedagogical · Live</div></a>
-      <a class="card" data-origin="coursework" data-domain="coursework" href="./pipelined-cpu/"><h3>Pipelined MIPS CPU</h3><p>Verilog datapath with forwarding, stall, flush, and a testbench. Student CPU, 2021.</p><div class="meta">Coursework · Systems</div></a>
+      <a class="card" data-origin="original" data-domain="research" href="./qg-lada-lab/"><h3>QG-LaDA Lab</h3><p>Spectral QG twin + localized EnKF reconstructs streamfunction from Lagrangian drifters.</p><div class="meta">Original · Live</div></a>
+      <a class="card" data-origin="original" data-domain="research" href="./local-wccm/"><h3>local_wccm</h3><p>MATLAB working copy of the barotropic Lagrangian filter used during the MSc.</p><div class="meta">Original · MATLAB</div></a>
+      <a class="card" data-origin="original" data-domain="research" href="../qg-lada/"><h3>QG-LaDA thesis page</h3><p>Existing academic companion with equations, results table, and BibTeX.</p><div class="meta">Original · Already deployed</div></a>
+      <a class="card" data-origin="extension" data-domain="research" href="./enme517-lab/"><h3>ENME 517 Lab</h3><p>Browser DoE lab: does obstacle-field structure change which searcher wins on expansions?</p><div class="meta">Extension · 2026 rebuild</div></a>
     </div>
-    <h2>Also documented</h2>
+
+    <h2>Perception / control</h2>
     <div class="grid">
-      <a class="card" data-origin="original" data-domain="intelligence" href="./world-pulse/"><h3>World Pulse</h3><p>Choropleth atlas of public development indicators.</p><div class="meta">Original · Intelligence</div></a>
-      <a class="card" data-origin="original" data-domain="product" href="./next-path/"><h3>Cube Trace</h3><p>Interactive NeXTcube lab: one pixel from camera to 10 Mbps Ethernet.</p><div class="meta">Original · Product</div></a>
+      <a class="card" data-origin="original" data-domain="perception" href="./axis-vision-pan-tilt/"><h3>AXIS Vision Pan/Tilt</h3><p>Camera error over UART to STM32 STEP/DIR. Software verified. Hardware not bench-tested.</p><div class="meta">Original · Live</div></a>
+      <a class="card" data-origin="original" data-domain="perception" href="./ai-perception-lab/"><h3>AI Perception Lab</h3><p>Local-first camera workstation. Real in-browser COCO-SSD. Fleet KPIs labeled simulation.</p><div class="meta">Original</div></a>
+      <a class="card" data-origin="experiment" data-domain="perception" href="./vla-drive-sim/"><h3>VLA Drive Sim</h3><p>Pedagogical driving loop. Language selects a path; PD emits actions. Not a trained VLA.</p><div class="meta">Experiment · Live</div></a>
+      <a class="card" data-origin="experiment" data-domain="perception" href="../vla-drive/"><h3>VLA Drive live sim</h3><p>Interactive forked-road demo already hosted on this site.</p><div class="meta">Experiment · On this site</div></a>
       <a class="card" data-origin="reproduction" data-domain="perception" href="./deco-lab/"><h3>DECO Lab</h3><p>RGB to SMPL contact viewer. Official DECO-HRNet weights are not loaded.</p><div class="meta">Reproduction / extension · Live</div></a>
-      <a class="card" data-origin="original" data-domain="intelligence" href="./resource-graph-crawler/"><h3>Resource Graph Crawler</h3><p>Same-host crawler with FastAPI control plane, Docker, and capped public API.</p><div class="meta">Original · Intelligence</div></a>
-      <a class="card" data-origin="original" data-domain="product" href="../aether-visualizer/"><h3>Aether Visualizer</h3><p>Cinematic music visualizer for microphone and tracks.</p><div class="meta">Original · Product · Live on this site</div></a>
-      <a class="card" data-origin="original" data-domain="research" href="../qg-lada/"><h3>QG-LaDA thesis page</h3><p>Existing academic companion page with equations, results table, and BibTeX.</p><div class="meta">Original · Already deployed</div></a>
-      <a class="card" data-origin="experiment" data-domain="experiment" href="../vla-drive/"><h3>VLA Drive live sim</h3><p>Interactive forked-road demo already hosted on this site.</p><div class="meta">Experiment · Live on this site</div></a>
-      <a class="card" data-origin="catalog" data-domain="catalog" href="./soc-cv-hardware-stack/"><h3>SoC → CV stack</h3><p>Interview map of smartphone SoCs and the photon-to-packet vision path.</p><div class="meta">Catalog · Not an implementation</div></a>
     </div>
+
+    <h2>Intelligence</h2>
+    <div class="grid">
+      <a class="card" data-origin="original" data-domain="intelligence" href="./meridian/"><h3>Meridian</h3><p>Research terminal that ranks papers and artifacts by technical depth, not virality.</p><div class="meta">Original · Live</div></a>
+      <a class="card" data-origin="original" data-domain="intelligence" href="./lattice/"><h3>Lattice</h3><p>Visual field manual of machine intelligence, from observation to papers.</p><div class="meta">Original · Live</div></a>
+      <a class="card" data-origin="original" data-domain="intelligence" href="./world-pulse/"><h3>World Pulse</h3><p>Choropleth atlas of public development indicators.</p><div class="meta">Original</div></a>
+      <a class="card" data-origin="original" data-domain="intelligence" href="./resource-graph-crawler/"><h3>Resource Graph Crawler</h3><p>Same-host crawler with FastAPI control plane, Docker, and a capped public API.</p><div class="meta">Original</div></a>
+      <a class="card" data-origin="original" data-domain="intelligence" href="./network-intelligence-dashboard/"><h3>Network Intelligence Dashboard</h3><p>Force-directed canvas graph. React chrome; d3-force runs outside React.</p><div class="meta">Original · Live</div></a>
+    </div>
+
+    <h2>Products</h2>
+    <div class="grid">
+      <a class="card" data-origin="original" data-domain="product" href="./next-path/"><h3>Cube Trace</h3><p>Interactive NeXTcube lab: one pixel from camera to 10 Mbps Ethernet.</p><div class="meta">Original</div></a>
+      <a class="card" data-origin="original" data-domain="product" href="../aether-visualizer/"><h3>Aether Visualizer</h3><p>Cinematic music visualizer for microphone and tracks.</p><div class="meta">Original · On this site</div></a>
+      <a class="card" data-origin="original" data-domain="product" href="./engineering-portfolio/"><h3>Engineering Portfolio</h3><p>Portfolio operating system with a transparent Project Signal Score. Stars are 5% of the score.</p><div class="meta">Original · App repo</div></a>
+      <a class="card" data-origin="original" data-domain="product" href="./wake/"><h3>Wake</h3><p>Interactive particle field. Pointer attract, click shockwave, on-device Canvas 2D.</p><div class="meta">Original · Live</div></a>
+      <a class="card" data-origin="original" data-domain="product" href="./websites-of-canada/"><h3>Websites of Canada</h3><p>Tribute kiosk to the VPL / Internet Archive exhibit. Not an official IA product.</p><div class="meta">Original · Live</div></a>
+    </div>
+
+    <h2>Systems / experiments</h2>
+    <div class="grid">
+      <a class="card" data-origin="coursework" data-domain="coursework" href="./pipelined-cpu/"><h3>Pipelined MIPS CPU</h3><p>Verilog datapath with forwarding, stall, flush, and a testbench. Student CPU, 2021.</p><div class="meta">Coursework · Systems</div></a>
+      <a class="card" data-origin="catalog" data-domain="catalog" href="./soc-cv-hardware-stack/"><h3>SoC → CV stack</h3><p>Interview map of smartphone SoCs and the photon-to-packet vision path.</p><div class="meta">Catalog</div></a>
+      <a class="card" data-origin="experiment" data-domain="experiment" href="./command-center/"><h3>AI Engineering Command Center</h3><p>Front-end command surface. Fleet GPU and cost KPIs are labeled simulation.</p><div class="meta">Experiment</div></a>
+      <a class="card" data-origin="experiment" data-domain="experiment" href="./applied-ai-lab/"><h3>Applied AI Lab</h3><p>Static demo of mini RAG, offline vs online pipelines, and prefill vs decode.</p><div class="meta">Experiment</div></a>
+      <a class="card" data-origin="experiment" data-domain="experiment" href="./tensortonic-rag/"><h3>TensorTonic RAG from scratch</h3><p>Readable Python RAG loop. Not TensorTonic the company. Learning repo.</p><div class="meta">Experiment</div></a>
+      <a class="card" data-origin="experiment" data-domain="experiment" href="./ridgeflight/"><h3>Ridgeflight</h3><p>Low-poly 3D terrain flyer. Toy for camera and lighting feel, not a flight simulator.</p><div class="meta">Experiment</div></a>
+    </div>
+
+    <h2>Coursework</h2>
+    <div class="grid">
+      <a class="card" data-origin="coursework" data-domain="coursework" href="./enme517/"><h3>ENME 517</h3><p>2024 UCalgary DoE archive: LaTeX report, notebooks, and pathfinding CSVs.</p><div class="meta">Coursework · 2024</div></a>
+      <a class="card" data-origin="coursework" data-domain="coursework" href="./cookoverflow/"><h3>CookOverflow</h3><p>2022 BSc Django recipe site plus recommender R&D. Undergraduate provenance.</p><div class="meta">Coursework · 2022</div></a>
+    </div>
+
+    <h2>Catalogs / notes</h2>
+    <div class="grid">
+      <a class="card" data-origin="catalog" data-domain="catalog" href="./pic2plate-notes/"><h3>Pic2Plate notes</h3><p>Engineering notes on Sensors 2025. Not the official implementation.</p><div class="meta">Catalog / notes</div></a>
+      <a class="card" data-origin="catalog" data-domain="catalog" href="./living-3d-roads/"><h3>Living 3D Roads</h3><p>Eight DL directions and nine mobility applications. Toy reconstruct is not a trained NeRF.</p><div class="meta">Catalog + toy</div></a>
+      <a class="card" data-origin="catalog" data-domain="catalog" href="./when-robots-understand-surfaces/"><h3>When Robots Understand Surfaces</h3><p>Eight DL directions, nine robotics applications, curated repos and GIFs.</p><div class="meta">Catalog</div></a>
+      <a class="card" data-origin="catalog" data-domain="catalog" href="./robot-data-gap-gofe/"><h3>Robot Data Gap / GOFE</h3><p>Study reconstruction of Goldberg’s MIT seminar. Not official AUTOLAB slides.</p><div class="meta">Catalog / notes</div></a>
+    </div>
+
     <section>
       <h2>What this is not</h2>
       <ul>
         <li>Not 300 equally featured repositories.</li>
-        <li>Not a rewrite of other people’s papers as if they were mine.</li>
+        <li>Not a rewrite of other people’s papers as original research.</li>
         <li>Not a dump of private thesis TeX, CVs, or generated scaffold names.</li>
         <li>Catalogs and notes stay labeled as catalogs and notes.</li>
       </ul>
     </section>
   </main>
-  <footer class="footer"><div class="inner"><p>Page language follows the <a href="https://chamelion-pages.github.io/">Chamelion</a> project-page shape (Nerfies / UMI on Legs family). Chamelion research is by Jang, Lee, Nahrendra, and Myung — not this portfolio.</p><p>Website template modified from <a href="https://nerfies.github.io/">NeRFies</a>. CC BY-SA 4.0.</p></div></footer>
+  <footer class="footer"><div class="inner"><p>Page language follows the <a href="https://chamelion-pages.github.io/">Chamelion</a> project-page shape. Chamelion research is by Jang, Lee, Nahrendra, and Myung — not this portfolio.</p><p>Website template modified from <a href="https://nerfies.github.io/">NeRFies</a>. CC BY-SA 4.0.</p></div></footer>
   <script src="./static/js/project.js"></script>
 </body>
 </html>
