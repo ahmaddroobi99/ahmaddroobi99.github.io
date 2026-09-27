@@ -1,0 +1,467 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>SECB Lab — schematic to job string to gantry</title>
+<meta name="description" content="Browser lab for SECB: draw a schematic, emit the Mega job string, watch the Cartesian gantry pick and place." />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Source+Serif+4:opsz,wght@8..60,600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet" />
+<style>
+:root {
+  --ink:#1a1a1a; --muted:#5b6570; --line:#e6e8eb; --wash:#f6f7f9;
+  --accent:#367dbd; --soft:#e8f1f8; --ok:#2f7d4a; --warn:#9a6b12;
+}
+* { box-sizing: border-box; }
+html, body { margin:0; padding:0; }
+body {
+  font-family: Inter, sans-serif; color: var(--ink);
+  background: linear-gradient(#fff, var(--wash)); line-height: 1.55;
+}
+.wrap { max-width: 1120px; margin: 0 auto; padding: 28px 18px 72px; }
+h1 { font-size: clamp(1.35rem, 2.6vw, 1.9rem); letter-spacing:-.02em; margin:0 0 6px; text-align:center; }
+.sub { text-align:center; color:var(--muted); margin:0 0 18px; }
+.sub a { color:var(--accent); text-decoration:none; font-weight:600; }
+.pills { display:flex; flex-wrap:wrap; justify-content:center; gap:8px; margin:0 0 22px; }
+.pills a {
+  padding:6px 12px; border:1px solid #c9d7e6; border-radius:999px;
+  color:var(--accent); text-decoration:none; font-size:.84rem; font-weight:600; background:#fff;
+}
+.layout { display:grid; grid-template-columns: 1fr 1.25fr; gap:16px; }
+@media (max-width: 900px) { .layout { grid-template-columns: 1fr; } }
+.card {
+  background:#fff; border:1px solid var(--line); border-radius:12px; padding:14px;
+}
+.card h2 { font-size:1rem; margin:0 0 10px; }
+canvas { width:100%; display:block; border-radius:8px; background:#fbfcfe; border:1px solid var(--line); cursor:crosshair; }
+.tools { display:flex; flex-wrap:wrap; gap:6px; margin:8px 0; }
+button, select {
+  font: 600 .8rem Inter, sans-serif; border:1px solid #c9d7e6; background:#fff;
+  border-radius:8px; padding:6px 10px; cursor:pointer; color:#243040;
+}
+button.primary { background:var(--accent); color:#fff; border-color:var(--accent); }
+button:hover { filter: brightness(0.97); }
+.tools button.active { background:var(--soft); border-color:var(--accent); color:var(--accent); }
+pre {
+  margin:8px 0 0; background:#1e2430; color:#e8eef6; border-radius:8px;
+  padding:10px 12px; font: 500 .78rem/1.45 "IBM Plex Mono", monospace;
+  overflow:auto; min-height:4.2em;
+}
+.meta { display:grid; grid-template-columns: repeat(4, 1fr); gap:8px; margin-top:10px; }
+@media (max-width:700px){ .meta { grid-template-columns: 1fr 1fr; } }
+.kpi { background:var(--wash); border-radius:8px; padding:8px 10px; }
+.kpi b { display:block; font-size:1.02rem; }
+.kpi span { color:var(--muted); font-size:.75rem; }
+.note { color:var(--muted); font-size:.86rem; margin:8px 0 0; }
+table { width:100%; border-collapse:collapse; font-size:.82rem; margin-top:8px; }
+th, td { text-align:left; padding:5px 6px; border-bottom:1px solid var(--line); }
+th { color:var(--muted); font-size:.72rem; letter-spacing:.04em; text-transform:uppercase; }
+.log { max-height:140px; overflow:auto; font: 500 .75rem/1.4 "IBM Plex Mono", monospace; color:#314055; }
+footer { margin-top:28px; text-align:center; color:var(--muted); font-size:.8rem; }
+</style>
+</head>
+<body>
+<main class="wrap">
+  <h1>SECB Lab</h1>
+  <p class="sub">Draw a schematic &rarr; emit the Mega job string &rarr; watch the gantry build it.<br />
+  This is not factory G-code. The 2022 machine speaks <code>start N take place &hellip;</code>.
+  <a href="../">Project page</a></p>
+  <nav class="pills">
+    <a href="../">Docs</a>
+    <a href="https://wokwi.com/projects/395880294285522945" target="_blank" rel="noopener">Wokwi Mega + stepper</a>
+    <a href="https://openpnp.org/" target="_blank" rel="noopener">OpenPnP simulator</a>
+    <a href="https://www.onshape.com/" target="_blank" rel="noopener">Onshape CAD</a>
+    <a href="https://github.com/ahmaddroobi99/GP2_HW_-Circuit_Recognition_2022">Vision repo</a>
+  </nav>
+
+  <div class="layout">
+    <section class="card">
+      <h2>1. Schematic page</h2>
+      <div class="tools" id="palette"></div>
+      <canvas id="schematic" width="640" height="400"></canvas>
+      <div class="tools">
+        <button id="demo">Load teaching circuit</button>
+        <button id="clear">Clear</button>
+        <button id="recognize" class="primary">Recognize + assign bins</button>
+      </div>
+      <p class="note">Click the canvas to drop the selected part. This lab skips OpenCV: you are both the student and the GUI correction stage.</p>
+      <table>
+        <thead><tr><th>Part</th><th>Value</th><th>Take</th><th>Place</th><th>Orient</th></tr></thead>
+        <tbody id="parts"></tbody>
+      </table>
+    </section>
+
+    <section class="card">
+      <h2>2. Machine table (mm from home)</h2>
+      <canvas id="machine" width="760" height="400"></canvas>
+      <div class="tools">
+        <button id="home">Home</button>
+        <button id="play" class="primary">Play job</button>
+        <button id="pause">Pause</button>
+        <label>Speed <select id="speed">
+          <option value="20">20× (watchable)</option>
+          <option value="50">50×</option>
+          <option value="5">5×</option>
+          <option value="1">1× real firmware</option>
+        </select></label>
+      </div>
+      <div class="meta">
+        <div class="kpi"><span>Head XY</span><b id="kpi-xy">0.0, 0.0</b></div>
+        <div class="kpi"><span>Z height</span><b id="kpi-z">144 mm</b></div>
+        <div class="kpi"><span>Sim time</span><b id="kpi-t">0.0 s</b></div>
+        <div class="kpi"><span>Held part</span><b id="kpi-hold">none</b></div>
+      </div>
+    </section>
+  </div>
+
+  <section class="card" style="margin-top:16px">
+    <h2>3. Job string the Mega actually parses</h2>
+    <pre id="job">start 0</pre>
+    <h2 style="margin-top:16px">4. Teaching G-code (not sent to this machine)</h2>
+    <p class="note">SECB never ran GRBL. This block is only so a CNC student can see the same tour as G0/G1 moves.</p>
+    <pre id="gcode">; no job yet</pre>
+    <h2 style="margin-top:16px">5. Motion log</h2>
+    <div class="log" id="log"></div>
+  </section>
+
+  <footer>
+    Take origin (9.5, 13.4), replace origin (40.5, 13.3), 8 mm/cycle, XY 5 mm/s, Z stroke 144 mm.
+    Firmware source: Drive <code>final_project</code>.
+  </footer>
+</main>
+<script>
+const TYPES = [
+  {id:"V", name:"source", color:"#d39b2a"},
+  {id:"C", name:"capacitor", color:"#367dbd"},
+  {id:"G", name:"ground", color:"#5b6570"},
+  {id:"D", name:"diode", color:"#7a4bb8"},
+  {id:"R", name:"resistor", color:"#c45c4a"},
+  {id:"L", name:"inductor", color:"#2f7d4a"}
+];
+const TAKE = {x0:9.5, y0:13.4};
+const REPL = {x0:40.5, y0:13.3};
+const XY_MM_S = 5;
+const Z_MM = 144;
+const Z_MM_S = 8.33;
+
+function takeXY(p){
+  const r = Math.floor(p/5), c = p % 5;
+  return {x: TAKE.x0 - r*2.5, y: TAKE.y0 + c*6.8};
+}
+function placeH(p){
+  const r = Math.floor(p/9), c = p % 9;
+  return {x: REPL.x0 - r*3.2, y: REPL.y0 + c*3.2 + 1.6};
+}
+function placeV(p){
+  const r = Math.floor(p/10), c = p % 10;
+  return {x: REPL.x0 - r*3.2 - 1.6, y: REPL.y0 + c*3.2};
+}
+
+const state = {
+  tool: "R",
+  parts: [],
+  wires: [],
+  head: {x:0, y:0, z:Z_MM},
+  hold: null,
+  placed: [],
+  stock: {},
+  t: 0,
+  queue: [],
+  playing: false,
+  last: 0
+};
+
+const pal = document.getElementById("palette");
+TYPES.forEach(t => {
+  const b = document.createElement("button");
+  b.textContent = t.id + " " + t.name;
+  b.dataset.id = t.id;
+  if (t.id === state.tool) b.classList.add("active");
+  b.onclick = () => {
+    state.tool = t.id;
+    [...pal.children].forEach(x => x.classList.toggle("active", x.dataset.id === t.id));
+  };
+  pal.appendChild(b);
+});
+
+const sc = document.getElementById("schematic");
+const sctx = sc.getContext("2d");
+const mc = document.getElementById("machine");
+const mctx = mc.getContext("2d");
+
+function typeOf(id){ return TYPES.find(t => t.id === id); }
+
+sc.addEventListener("click", ev => {
+  const r = sc.getBoundingClientRect();
+  const x = (ev.clientX - r.left) * sc.width / r.width;
+  const y = (ev.clientY - r.top) * sc.height / r.height;
+  const n = state.parts.filter(p => p.id === state.tool).length;
+  const values = {V:"5", C:"100u", G:"0", D:"1N4148", R:"220", L:"10m"};
+  state.parts.push({
+    id: state.tool, name: state.tool + n,
+    value: values[state.tool], sx:x, sy:y,
+    take:-1, place:-1, vert: state.tool === "D" || state.tool === "L"
+  });
+  drawSchematic(); renderTable();
+});
+
+document.getElementById("clear").onclick = () => {
+  state.parts = []; state.placed = []; state.hold = null; state.queue = [];
+  drawSchematic(); drawMachine(); renderTable(); emit();
+};
+document.getElementById("demo").onclick = loadDemo;
+document.getElementById("recognize").onclick = recognize;
+document.getElementById("home").onclick = () => { state.head = {x:0,y:0,z:Z_MM}; drawMachine(); };
+document.getElementById("play").onclick = play;
+document.getElementById("pause").onclick = () => { state.playing = false; };
+
+function loadDemo(){
+  state.parts = [
+    {id:"V", name:"V0", value:"5", sx:90, sy:200, take:-1, place:-1, vert:false},
+    {id:"R", name:"R0", value:"220", sx:220, sy:200, take:-1, place:-1, vert:false},
+    {id:"C", name:"C0", value:"100u", sx:350, sy:200, take:-1, place:-1, vert:false},
+    {id:"L", name:"L0", value:"10m", sx:480, sy:200, take:-1, place:-1, vert:true},
+    {id:"D", name:"D0", value:"1N4148", sx:350, sy:110, take:-1, place:-1, vert:true},
+    {id:"G", name:"G0", value:"0", sx:580, sy:200, take:-1, place:-1, vert:false}
+  ];
+  recognize();
+}
+
+function recognize(){
+  state.parts.forEach((p,i) => {
+    p.take = i;              // 0..19 row-major
+    p.place = i;             // replace index
+  });
+  state.stock = {};
+  state.parts.forEach(p => { state.stock[p.take] = p; });
+  state.placed = [];
+  renderTable(); emit(); drawSchematic(); drawMachine();
+  logLine("recognized " + state.parts.length + " parts, bins assigned 0.." + (state.parts.length-1));
+}
+
+function renderTable(){
+  document.getElementById("parts").innerHTML = state.parts.map(p =>
+    `<tr><td>${p.name}</td><td>${p.value}</td><td>${p.take}</td><td>${p.place}</td><td>${p.vert?"V":"H"}</td></tr>`
+  ).join("");
+}
+
+function emit(){
+  const n = state.parts.length;
+  const pairs = state.parts.map(p => p.take + " " + p.place).join(" ");
+  document.getElementById("job").textContent = n ? (`start ${n} ${pairs}`) : "start 0";
+  const lines = ["; SECB teaching G-code — NOT flashed to the Mega","; XY 5 mm/s, Z 8.3 mm/s, no accel",
+    "G21 ; mm", "G90 ; absolute", "G28 ; home Z then X then Y"];
+  state.parts.forEach(p => {
+    const t = takeXY(p.take);
+    const r = p.vert ? placeV(p.place) : placeH(p.place);
+    lines.push(`G0 X${t.x.toFixed(1)} Y${t.y.toFixed(1)} ; take ${p.name}`);
+    lines.push(`G1 Z0 F500 ; down 144 mm`);
+    lines.push(`M3 ; gripper 20 deg`);
+    lines.push(`G1 Z144`);
+    if (p.vert) lines.push(`M101 S74 ; rotate wrist`);
+    lines.push(`G0 X${r.x.toFixed(1)} Y${r.y.toFixed(1)} ; place ${p.name}`);
+    lines.push(`G1 Z0`);
+    lines.push(`M5 ; gripper open`);
+    lines.push(`G1 Z144`);
+    if (p.vert) lines.push(`M101 S0`);
+  });
+  document.getElementById("gcode").textContent = lines.join("\n");
+}
+
+function drawSchematic(){
+  const c = sctx, w = sc.width, h = sc.height;
+  c.clearRect(0,0,w,h);
+  c.fillStyle = "#fbfcfe"; c.fillRect(0,0,w,h);
+  c.strokeStyle = "#edf1f5";
+  for (let x=40;x<w;x+=40){ c.beginPath(); c.moveTo(x,0); c.lineTo(x,h); c.stroke(); }
+  for (let y=40;y<h;y+=40){ c.beginPath(); c.moveTo(0,y); c.lineTo(w,y); c.stroke(); }
+  if (state.parts.length >= 2){
+    c.strokeStyle = "#9aa7b5"; c.lineWidth = 2;
+    c.beginPath();
+    state.parts.filter(p=>!p.vert).forEach((p,i,a)=>{
+      if(i===0) c.moveTo(p.sx,p.sy); else c.lineTo(p.sx,p.sy);
+    });
+    c.stroke();
+  }
+  state.parts.forEach(p => {
+    const col = typeOf(p.id).color;
+    c.fillStyle = col; c.strokeStyle = col; c.lineWidth = 2;
+    c.beginPath(); c.arc(p.sx, p.sy, 16, 0, Math.PI*2); c.fill();
+    c.fillStyle = "#fff"; c.font = "700 12px Inter"; c.textAlign="center"; c.textBaseline="middle";
+    c.fillText(p.id, p.sx, p.sy);
+    c.fillStyle = "#314055"; c.font = "500 11px Inter";
+    c.fillText(p.name+" "+p.value, p.sx, p.sy+28);
+  });
+}
+
+function worldToPix(x,y){
+  // table spans x 0..55, y 0..45
+  const pad=36, w=mc.width-pad*2, h=mc.height-pad*2;
+  return {x: pad + x/55*w, y: pad + y/45*h};
+}
+
+function drawMachine(){
+  const c = mctx, w=mc.width, h=mc.height;
+  c.clearRect(0,0,w,h);
+  c.fillStyle="#0f1720"; c.fillRect(0,0,w,h);
+  c.fillStyle="#d7e4f2"; c.font="600 12px Inter";
+  c.fillText("home (0,0)", 12, 18);
+  c.fillText("take 4×5", 12, 36);
+  c.fillText("replace 10×7", worldToPix(40.5,4).x, 36);
+
+  // take bins 0-19
+  for (let p=0;p<20;p++){
+    const t = takeXY(p), q = worldToPix(t.x, t.y);
+    c.fillStyle = state.stock[p] && !state.placed.includes(state.stock[p].name) && state.hold !== state.stock[p].name ? "#2a3d2f" : "#1d2a38";
+    c.strokeStyle = "#4d7ea8";
+    c.beginPath(); c.rect(q.x-10, q.y-8, 20, 16); c.fill(); c.stroke();
+    c.fillStyle="#9bb0c4"; c.font="500 9px Inter"; c.textAlign="center";
+    c.fillText(String(p), q.x, q.y+3);
+    if (state.stock[p] && !state.placed.includes(state.stock[p].name) && state.hold !== state.stock[p].name){
+      c.fillStyle = typeOf(state.stock[p].id).color;
+      c.beginPath(); c.arc(q.x, q.y-14, 5, 0, Math.PI*2); c.fill();
+    }
+  }
+  // replace cells
+  for (let p=0;p<20;p++){
+    const t = placeH(p), q = worldToPix(t.x, t.y);
+    c.strokeStyle="#3d5a4c"; c.fillStyle="#162018";
+    c.beginPath(); c.rect(q.x-8, q.y-8, 16, 16); c.fill(); c.stroke();
+  }
+  state.placed.forEach((name,i) => {
+    const p = state.parts.find(x => x.name===name);
+    if(!p) return;
+    const t = p.vert ? placeV(p.place) : placeH(p.place);
+    const q = worldToPix(t.x, t.y);
+    c.fillStyle = typeOf(p.id).color;
+    c.beginPath(); c.arc(q.x, q.y, 6, 0, Math.PI*2); c.fill();
+    c.fillStyle="#e8eef6"; c.font="600 8px Inter"; c.textAlign="center";
+    c.fillText(p.id, q.x, q.y+3);
+  });
+
+  const hd = worldToPix(state.head.x, state.head.y);
+  const lift = state.head.z / Z_MM;
+  c.strokeStyle="#6ea0c8"; c.setLineDash([4,4]);
+  c.beginPath(); c.moveTo(worldToPix(0,0).x, worldToPix(0,0).y); c.lineTo(hd.x, hd.y); c.stroke();
+  c.setLineDash([]);
+  c.fillStyle = `rgba(110,160,200,${0.25+0.55*(1-lift)})`;
+  c.beginPath(); c.arc(hd.x, hd.y, 8 + (1-lift)*6, 0, Math.PI*2); c.fill();
+  c.strokeStyle="#d7e4f2"; c.lineWidth=2;
+  c.beginPath(); c.arc(hd.x, hd.y, 10, 0, Math.PI*2); c.stroke();
+  if (state.hold){
+    const p = state.parts.find(x => x.name===state.hold);
+    c.fillStyle = typeOf(p.id).color;
+    c.beginPath(); c.arc(hd.x, hd.y-14, 6, 0, Math.PI*2); c.fill();
+  }
+  document.getElementById("kpi-xy").textContent = state.head.x.toFixed(1)+", "+state.head.y.toFixed(1);
+  document.getElementById("kpi-z").textContent = state.head.z.toFixed(0)+" mm";
+  document.getElementById("kpi-t").textContent = state.t.toFixed(1)+" s";
+  document.getElementById("kpi-hold").textContent = state.hold || "none";
+}
+
+function logLine(s){
+  const el = document.getElementById("log");
+  el.textContent += s + "\n";
+  el.scrollTop = el.scrollHeight;
+}
+
+function seqTime(ax,ay,bx,by){
+  return (Math.abs(bx-ax)+Math.abs(by-ay))/XY_MM_S;
+}
+
+function buildQueue(){
+  const q = [];
+  q.push({kind:"home"});
+  state.parts.forEach(p => {
+    const t = takeXY(p.take);
+    const r = p.vert ? placeV(p.place) : placeH(p.place);
+    q.push({kind:"goto", x:t.x, y:t.y, note:"take "+p.name});
+    q.push({kind:"z", z:0, note:"Z down"});
+    q.push({kind:"grip", name:p.name});
+    q.push({kind:"z", z:Z_MM, note:"Z up"});
+    q.push({kind:"goto", x:r.x, y:r.y, note:"place "+p.name});
+    q.push({kind:"z", z:0, note:"Z down"});
+    q.push({kind:"drop", name:p.name});
+    q.push({kind:"z", z:Z_MM, note:"Z up"});
+  });
+  return q;
+}
+
+function play(){
+  if (!state.parts.length) loadDemo();
+  if (state.parts.some(p => p.take < 0)) recognize();
+  state.queue = buildQueue();
+  state.playing = true;
+  state.last = performance.now();
+  state.t = 0;
+  state.placed = [];
+  state.hold = null;
+  state.head = {x:0,y:0,z:Z_MM};
+  document.getElementById("log").textContent = "";
+  logLine("I started working");
+  logLine(document.getElementById("job").textContent);
+  requestAnimationFrame(tick);
+}
+
+function tick(now){
+  if (!state.playing) return;
+  const speed = Number(document.getElementById("speed").value);
+  const dt = Math.min(0.05, (now - state.last)/1000) * speed;
+  state.last = now;
+  state.t += dt / speed; // wall-clock firmware seconds accumulate slowly? keep sim-seconds
+  // accumulate firmware-equivalent time
+  stepQueue(dt);
+  drawMachine();
+  if (state.playing) requestAnimationFrame(tick);
+}
+
+function stepQueue(dt){
+  const cur = state.queue[0];
+  if (!cur){ state.playing = false; logLine("job finished"); return; }
+  if (cur.kind === "home"){
+    logLine("Start resetting");
+    state.head = {x:0,y:0,z:Z_MM};
+    state.queue.shift();
+    return;
+  }
+  if (cur.kind === "goto"){
+    const dx = cur.x - state.head.x, dy = cur.y - state.head.y;
+    const dist = Math.abs(dx)+Math.abs(dy);
+    if (!cur._logged){ logLine("I'm going for x: "+cur.x.toFixed(1)+" y: "+cur.y.toFixed(1)+"  ("+cur.note+")"); cur._logged=true; }
+    if (dist < 0.15){ state.head.x = cur.x; state.head.y = cur.y; state.queue.shift(); return; }
+    // sequential X then Y like firmware
+    if (Math.abs(dx) > 0.05){
+      const step = Math.sign(dx) * Math.min(Math.abs(dx), XY_MM_S * dt);
+      state.head.x += step;
+    } else {
+      const step = Math.sign(dy) * Math.min(Math.abs(dy), XY_MM_S * dt);
+      state.head.y += step;
+    }
+    return;
+  }
+  if (cur.kind === "z"){
+    const dz = cur.z - state.head.z;
+    if (!cur._logged){ logLine(cur.note); cur._logged=true; }
+    if (Math.abs(dz) < 1){ state.head.z = cur.z; state.queue.shift(); return; }
+    state.head.z += Math.sign(dz) * Math.min(Math.abs(dz), Z_MM_S * dt);
+    return;
+  }
+  if (cur.kind === "grip"){
+    state.hold = cur.name;
+    delete state.stock[state.parts.find(p=>p.name===cur.name).take];
+    logLine("grip "+cur.name);
+    state.queue.shift(); return;
+  }
+  if (cur.kind === "drop"){
+    state.placed.push(cur.name);
+    state.hold = null;
+    logLine("drop "+cur.name);
+    state.queue.shift(); return;
+  }
+}
+
+drawSchematic(); drawMachine(); loadDemo();
+</script>
+</body>
+</html>
