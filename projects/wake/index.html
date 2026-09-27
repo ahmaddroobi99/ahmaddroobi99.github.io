@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Wake</title>
+  <meta name="description" content="Interactive particle field that swirls toward the cursor. On-device Canvas 2D." />
+  <meta name="theme-color" content="#1f6f50" />
+  <link href="https://fonts.googleapis.com/css?family=Google+Sans|Noto+Sans" rel="stylesheet" />
+  <link rel="stylesheet" href="../static/css/project.css" />
+</head>
+<body>
+  <section class="hero">
+    <div class="hero-inner">
+      <p class="publication-name">Wake</p>
+      <h1 class="publication-paper-title">Interactive particle field that swirls toward the cursor</h1>
+      <p class="publication-authors"><a href="https://github.com/ahmaddroobi99">Ahmad Droobi</a></p>
+      <p class="publication-affil">On-device Canvas 2D simulation</p>
+      <div class="publication-venue">Original product</div>
+      <span class="origin">Original</span>
+      <div class="publication-links">
+        <a href="https://github.com/ahmaddroobi99/wake">Code</a>
+        <a href="https://wake-field.netlify.app">Live</a>
+        <a href="../">Projects</a>
+      </div>
+    </div>
+  </section>
+  <main class="wrap">
+    <section>
+      <h2>Problem</h2>
+      <p>Most particle demos hide the force field. Wake makes the field the product: pointer position becomes attraction, a click becomes a shockwave, and trails show the integration.</p>
+    </section>
+    <section>
+      <h2>What it is / is not</h2>
+      <p>It is an interactive canvas field. Move the pointer to swirl motes; click to burst them outward. It is not a physics engine paper and not a GPU particle library.</p>
+    </section>
+    <section>
+      <h2>Architecture</h2>
+      <pre class="flow">pointer / click
+    ↓
+force field
+    ↓
+particle integration
+    ↓
+trails + color shift
+    ↓
+Canvas 2D</pre>
+    </section>
+    <section>
+      <h2>Implementation</h2>
+      <p>TanStack Start, React, Tailwind, Canvas 2D. All simulation stays on-device.</p>
+    </section>
+    <section>
+      <h2>Evidence</h2>
+      <ul>
+        <li>Public repo: ahmaddroobi99/wake</li>
+        <li>Live: wake-field.netlify.app</li>
+      </ul>
+    </section>
+  </main>
+  <footer class="footer"><div class="inner"><p>Website template modified from <a href="https://nerfies.github.io/">NeRFies</a> and the <a href="https://chamelion-pages.github.io/">Chamelion</a> page shape. CC BY-SA 4.0.</p></div></footer>
+</body>
+</html>

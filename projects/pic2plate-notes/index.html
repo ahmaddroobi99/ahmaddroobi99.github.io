@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Pic2Plate notes</title>
+  <meta name="description" content="Engineering notes on Pic2Plate (Sensors 2025). Not an official implementation." />
+  <meta name="theme-color" content="#1f6f50" />
+  <link href="https://fonts.googleapis.com/css?family=Google+Sans|Noto+Sans" rel="stylesheet" />
+  <link rel="stylesheet" href="../static/css/project.css" />
+</head>
+<body>
+  <section class="hero">
+    <div class="hero-inner">
+      <p class="publication-name">Pic2Plate notes</p>
+      <h1 class="publication-paper-title">Vision to structured names to iterative retrieval</h1>
+      <p class="publication-authors"><a href="https://github.com/ahmaddroobi99">Ahmad Droobi</a></p>
+      <p class="publication-affil">Study notes on Soekamto et al., Sensors 2025</p>
+      <div class="publication-venue">Catalog / notes · not official code</div>
+      <span class="origin">Catalog</span>
+      <div class="publication-links">
+        <a href="https://github.com/ahmaddroobi99/pic2plate-notes">Notes</a>
+        <a href="https://doi.org/10.3390/s25020449">Paper</a>
+        <a href="https://github.com/leonardcl/pic2plate">Authors’ notebooks</a>
+        <a href="../">Projects</a>
+      </div>
+    </div>
+  </section>
+  <main class="wrap">
+    <section>
+      <h2>Problem</h2>
+      <p>How does a camera observation become a structured list of ingredient names, then a retrieved document, then a recommendation — without pretending a local library is GPT-4o?</p>
+    </section>
+    <section>
+      <h2>What it is / is not</h2>
+      <p>It is a local-first reading of Pic2Plate: name schema, coverage score, retrieve-evaluate-refine loop, and transcribed paper figures. It is not the official implementation, does not ship model weights, and does not generate recipes from a hidden API key.</p>
+    </section>
+    <section>
+      <h2>Architecture</h2>
+      <pre class="flow">image
+    ↓
+vision → structured names (and stop)
+    ↓
+retrieve → score → rewrite query → retrieve
+    ↓
+recommendation document</pre>
+    </section>
+    <section>
+      <h2>Evidence</h2>
+      <ul>
+        <li>Paper: doi:10.3390/s25020449</li>
+        <li>Official notebooks: leonardcl/pic2plate</li>
+        <li>This repo cites the paper and keeps interfaces local.</li>
+      </ul>
+    </section>
+  </main>
+  <footer class="footer"><div class="inner"><p>Website template modified from <a href="https://nerfies.github.io/">NeRFies</a> and the <a href="https://chamelion-pages.github.io/">Chamelion</a> page shape. CC BY-SA 4.0.</p></div></footer>
+</body>
+</html>

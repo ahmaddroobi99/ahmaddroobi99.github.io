@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>ENME 517 Lab</title>
+  <meta name="description" content="Real-time design-of-experiments lab for shortest-path search on stochastic obstacle fields." />
+  <meta name="theme-color" content="#1f6f50" />
+  <link href="https://fonts.googleapis.com/css?family=Google+Sans|Noto+Sans" rel="stylesheet" />
+  <link rel="stylesheet" href="../static/css/project.css" />
+</head>
+<body>
+  <section class="hero">
+    <div class="hero-inner">
+      <p class="publication-name">ENME 517 Lab</p>
+      <h1 class="publication-paper-title">Does obstacle-field structure change which search algorithm wins?</h1>
+      <p class="publication-authors"><a href="https://github.com/ahmaddroobi99">Ahmad Droobi</a></p>
+      <p class="publication-affil">University of Calgary · ENME / ENMF 517 rebuilt as a live lab in 2026</p>
+      <div class="publication-venue">Extension of the 2024 course archive</div>
+      <span class="origin">Extension</span>
+      <div class="publication-links">
+        <a href="https://github.com/ahmaddroobi99/enme517-lab">Code</a>
+        <a href="https://github.com/ahmaddroobi99/ENME517">2024 archive</a>
+        <a href="../enme517/">Course page</a>
+        <a href="../">Projects</a>
+      </div>
+    </div>
+  </section>
+  <main class="wrap">
+    <section>
+      <h2>Problem</h2>
+      <p>The 2024 report mixed three goals and treated cell means as observations (ANOVA residual DF = 0). The live lab asks one ranking question: does field structure change which searcher is statistically dominant on node expansions, and at what occupancy does A* lose that advantage?</p>
+    </section>
+    <section>
+      <h2>What it is / is not</h2>
+      <p>It is a TypeScript port of the 2024 notebooks: occupancy generators, A*/Weighted A*/Dijkstra/BFS/DFS/Greedy, factorial and LHS designs, two-way ANOVA with replicates. It is not a robotics stack and it does not keep the 2024 CNN-as-result.</p>
+    </section>
+    <section>
+      <h2>Architecture</h2>
+      <pre class="flow">structure family × occupancy × algorithm × grid n
+    ↓
+search on stochastic field
+    ↓
+responses: path length L, expansions O, optimality gap
+    ↓
+two-way ANOVA with genuine replicates</pre>
+    </section>
+    <section>
+      <h2>Evidence</h2>
+      <p class="note">Re-analysis of the 2024 archive (900 rows, residual DF = 891): algorithm main effect is large; structure main effect is larger; algorithm × structure interaction is significant.</p>
+    </section>
+  </main>
+  <footer class="footer"><div class="inner"><p>Website template modified from <a href="https://nerfies.github.io/">NeRFies</a> and the <a href="https://chamelion-pages.github.io/">Chamelion</a> page shape. CC BY-SA 4.0.</p></div></footer>
+</body>
+</html>
