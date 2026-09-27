@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Hilbert Space to Display — Ahmad Droobi</title>
+  <link href="https://fonts.googleapis.com/css?family=Google+Sans|Noto+Sans|Castoro" rel="stylesheet" />
+  <link rel="stylesheet" href="../static/css/project.css" />
+</head>
+<body>
+  <section class="hero">
+    <div class="hero-inner">
+      <p class="publication-name">Hilbert Space to Display</p>
+      <h1 class="publication-paper-title">The QPU is not on the pixel bus</h1>
+      <p class="publication-authors"><a href="https://github.com/ahmaddroobi99">Ahmad Droobi</a></p>
+      <p class="publication-venue">Notes · Quantum Sense Ch. 1–14</p>
+      <span class="origin">Catalog / notes</span>
+      <nav class="publication-links">
+        <a href="https://github.com/ahmaddroobi99/hilbert-space-to-display">Code</a>
+        <a href="https://www.youtube.com/playlist?list=PL8ER5-vAoiHAWm1UcZsiauUGPlJChgNXC">Playlist</a>
+        <a href="../">Projects</a>
+      </nav>
+    </div>
+  </section>
+  <main class="wrap">
+    <section>
+      <h2>What it is / is not</h2>
+      <p>A compressed map of Brandon Sandoval’s Maths of Quantum Mechanics onto one hardware question. Not a transcript dump. Not a claim that phones compute in superposition.</p>
+      <pre class="flow">world → ADC → host CPU/GPU
+  → DAC + IQ pulses
+  → [ QPU : |ψ⟩ ↦ U(t)|ψ⟩ ]
+  → readout → bits → display</pre>
+      <p>Only the bracket is quantum. A FET is not a drop-in qubit.</p>
+    </section>
+  </main>
+  <footer class="footer"><div class="inner"><p>Template language from <a href="https://nerfies.github.io/">NeRFies</a> / Chamelion shape. Videos © Quantum Sense.</p></div></footer>
+</body>
+</html>
