@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>SECB Labs — timing, protocol, coordinates</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet" />
+<style>
+:root { --ink:#1a1a1a; --muted:#5b6570; --line:#e6e8eb; --wash:#f6f7f9; --accent:#367dbd; --soft:#e8f1f8; --ok:#2f7d4a; --recon:#9a6b12; --prop:#5b4bb8; }
+* { box-sizing:border-box; } body { margin:0; font-family:Inter,sans-serif; color:var(--ink); background:linear-gradient(#fff,var(--wash)); line-height:1.55; }
+.wrap { max-width:1040px; margin:0 auto; padding:28px 18px 72px; }
+h1 { text-align:center; font-size:clamp(1.3rem,2.6vw,1.85rem); letter-spacing:-.02em; margin:0 0 6px; }
+.sub { text-align:center; color:var(--muted); margin:0 0 16px; }
+.sub a { color:var(--accent); text-decoration:none; font-weight:600; }
+.pills { display:flex; flex-wrap:wrap; justify-content:center; gap:8px; margin:0 0 22px; }
+.pills a { padding:6px 12px; border:1px solid #c9d7e6; border-radius:999px; color:var(--accent); text-decoration:none; font-size:.84rem; font-weight:600; background:#fff; }
+.card { background:#fff; border:1px solid var(--line); border-radius:12px; padding:16px; margin:0 0 16px; }
+.card h2 { margin:0 0 10px; font-size:1.05rem; }
+label { display:block; font-size:.82rem; color:var(--muted); margin:8px 0 4px; }
+input[type=range] { width:100%; }
+input[type=text], input[type=number] { width:100%; padding:8px 10px; border:1px solid #c9d7e6; border-radius:8px; font:500 .9rem "IBM Plex Mono",monospace; }
+.kpis { display:grid; grid-template-columns:repeat(4,1fr); gap:8px; margin-top:10px; }
+@media (max-width:800px){ .kpis { grid-template-columns:1fr 1fr; } }
+.kpi { background:var(--wash); border-radius:8px; padding:8px 10px; }
+.kpi b { display:block; font-size:1.05rem; }
+.kpi span { font-size:.75rem; color:var(--muted); }
+pre { background:#1e2430; color:#e8eef6; border-radius:8px; padding:12px; font:500 .78rem/1.45 "IBM Plex Mono",monospace; overflow:auto; }
+.tag { display:inline-block; font-size:.7rem; font-weight:700; letter-spacing:.04em; padding:2px 7px; border-radius:999px; margin-right:4px; }
+.tag.o { background:#d7efe0; color:var(--ok); }
+.tag.r { background:#f6e7c8; color:var(--recon); }
+.tag.p { background:#e4def6; color:var(--prop); }
+.states { display:flex; flex-wrap:wrap; gap:6px; }
+.state { padding:6px 10px; border-radius:8px; background:#f0f2f5; font-size:.8rem; font-weight:600; }
+.state.on { background:var(--accent); color:#fff; }
+.note { color:var(--muted); font-size:.86rem; }
+button { font:600 .82rem Inter,sans-serif; border:1px solid #c9d7e6; background:#fff; border-radius:8px; padding:7px 12px; cursor:pointer; }
+button.primary { background:var(--accent); color:#fff; border-color:var(--accent); }
+.journey { display:flex; flex-wrap:wrap; gap:6px; }
+.jstep { background:var(--wash); border-radius:8px; padding:6px 8px; font-size:.78rem; }
+.jstep.on { background:var(--soft); outline:1px solid var(--accent); }
+</style>
+</head>
+<body>
+<main class="wrap">
+  <h1>SECB Labs</h1>
+  <p class="sub">Interactive engineering benches on top of the 2022 machine.<br />
+  <a href="../">Project page</a> · <a href="../sim/">Gantry player</a></p>
+  <nav class="pills">
+    <a href="#timing">Timing</a>
+    <a href="#math">Motor math</a>
+    <a href="#xy">Coordinates</a>
+    <a href="#proto">Protocol</a>
+    <a href="#states">States</a>
+    <a href="#r0">Follow R0</a>
+    <a href="../sim/">Play job</a>
+  </nav>
+
+  <section class="card">
+    <h2>Provenance</h2>
+    <p><span class="tag o">ORIGINAL</span> in the 2022 firmware, report, or vision repo.
+       <span class="tag r">RECONSTRUCTED</span> computed here from those numbers.
+       <span class="tag p">PROPOSED</span> 2026 teaching layer, not on the Nablus frame.</p>
+    <p class="note">No invented accuracy plots. No 2022 Wi-Fi password. Drive photos stay in Drive.</p>
+  </section>
+
+  <section class="card" id="timing">
+    <h2><span class="tag r">RECONSTRUCTED</span> Timing / CPH bench</h2>
+    <p class="note">Formula from <code>motor_utils.cpp</code>: 1600 pulses = 8 mm. XY 500+500 µs. Z 300+300 µs. Four Z strokes per part.</p>
+    <label>Z stroke (mm) <b id="zmm">144</b></label>
+    <input id="z" type="range" min="20" max="160" value="144" />
+    <label>XY speed (mm/s) <b id="xys">5.0</b></label>
+    <input id="xy" type="range" min="5" max="200" value="5" />
+    <label>Z speed (mm/s) <b id="zs">8.3</b></label>
+    <input id="zv" type="range" min="5" max="80" step="0.1" value="8.3" />
+    <label>Servo settle (s) <b id="ss">2.5</b></label>
+    <input id="sv" type="range" min="0" max="4" step="0.1" value="2.5" />
+    <label>XY Manhattan tour take→place (mm) <b id="tour">53.5</b></label>
+    <input id="tv" type="range" min="10" max="120" step="0.5" value="53.5" />
+    <div class="kpis">
+      <div class="kpi"><span>One Z trip</span><b id="k-ztrip">17.3 s</b></div>
+      <div class="kpi"><span>Four Z + XY + settle</span><b id="k-tact">89 s</b></div>
+      <div class="kpi"><span>CPH</span><b id="k-cph">40</b></div>
+      <div class="kpi"><span>Z share of tact</span><b id="k-share">78%</b></div>
+    </div>
+    <p class="note">Move Z to 30 mm and XY to 100 mm/s: that is the desktop-PnP neighborhood, not this frame. Pulse-rate heroics on A4988 + 144 mm Z do not get you there.</p>
+  </section>
+
+  <section class="card" id="math">
+    <h2><span class="tag o">ORIGINAL</span> Motor math</h2>
+    <p class="note">Report: 800 full steps/rev, 16-tooth pulley, 2 mm pitch → 32 mm/rev. Firmware uses 1/8 microstep.</p>
+    <label>Microstep (1,2,4,8,16)</label>
+    <input id="ms" type="number" value="8" min="1" max="32" />
+    <div class="kpis">
+      <div class="kpi"><span>µsteps / rev</span><b id="m-spr">6400</b></div>
+      <div class="kpi"><span>µsteps / mm</span><b id="m-spm">200</b></div>
+      <div class="kpi"><span>mm / cycle (1600 pulses)</span><b id="m-cyc">8.00</b></div>
+      <div class="kpi"><span>XY mm/s at 1 kHz</span><b id="m-vel">5.00</b></div>
+    </div>
+  </section>
+
+  <section class="card" id="xy">
+    <h2><span class="tag o">ORIGINAL</span> Take / replace coordinates</h2>
+    <label>Take bin p (0–19)</label>
+    <input id="tp" type="number" min="0" max="19" value="10" />
+    <label>Replace index p</label>
+    <input id="rp" type="number" min="0" max="69" value="5" />
+    <label>Orientation</label>
+    <select id="ori" style="padding:8px;border-radius:8px;border:1px solid #c9d7e6;">
+      <option value="H">horizontal (+1.6 mm on Y)</option>
+      <option value="V">vertical (−1.6 mm on X, wrist 74°)</option>
+    </select>
+    <div class="kpis">
+      <div class="kpi"><span>Take XY</span><b id="txy">4.5, 13.4</b></div>
+      <div class="kpi"><span>Place XY</span><b id="pxy">40.5, 30.9</b></div>
+      <div class="kpi"><span>Take µsteps from home</span><b id="tst">900, 2680</b></div>
+      <div class="kpi"><span>Manhattan mm</span><b id="man">53.5</b></div>
+    </div>
+    <p class="note">200 µsteps/mm. Image pixels never enter this box. That is the whole point of the unfinished parser.</p>
+  </section>
+
+  <section class="card" id="proto">
+    <h2><span class="tag o">ORIGINAL</span> Job-string decoder</h2>
+    <label>Line the Mega was written to parse</label>
+    <input id="line" type="text" value="start 2 10 5 12 3" />
+    <button class="primary" id="decode">Decode</button>
+    <pre id="dec">…</pre>
+    <p class="note"><span class="tag p">PROPOSED</span> A modern framed packet would add a checksum. The 2022 line has none. Truncation becomes take-bin 0.</p>
+  </section>
+
+  <section class="card" id="states">
+    <h2><span class="tag r">RECONSTRUCTED</span> Job state machine</h2>
+    <p class="note">The Mega is blocking <code>delay()</code> + pulse loops, not a written FSM. This is the implicit one.</p>
+    <div class="states" id="sm"></div>
+    <div class="kpis"><div class="kpi"><span>Step</span><b id="sm-now">IDLE</b></div></div>
+    <button id="sm-next" class="primary">Advance</button>
+    <button id="sm-rst">Reset</button>
+  </section>
+
+  <section class="card" id="r0">
+    <h2><span class="tag p">PROPOSED</span> Follow one resistor</h2>
+    <p class="note">Teaching story, not a logged 2023 trace of a specific R0.</p>
+    <div class="journey" id="jr"></div>
+    <button id="jr-next" class="primary">Next hop</button>
+    <button id="jr-rst">Reset</button>
+    <pre id="jr-txt"></pre>
+  </section>
+</main>
+<script>
+const $ = id => document.getElementById(id);
+function timing(){
+  const Z = +$('z').value, xy = +$('xy').value, zv = +$('zv').value, sv = +$('sv').value, tour = +$('tv').value;
+  $('zmm').textContent = Z; $('xys').textContent = xy.toFixed(1); $('zs').textContent = zv.toFixed(1); $('ss').textContent = sv.toFixed(1); $('tour').textContent = tour.toFixed(1);
+  const ztrip = Z / zv;
+  const tact = 4*ztrip + tour/xy + 2*sv;
+  const cph = 3600/tact;
+  $('k-ztrip').textContent = ztrip.toFixed(1)+' s';
+  $('k-tact').textContent = tact.toFixed(1)+' s';
+  $('k-cph').textContent = cph.toFixed(0);
+  $('k-share').textContent = ((4*ztrip/tact)*100).toFixed(0)+'%';
+}
+['z','xy','zv','sv','tv'].forEach(id => $(id).addEventListener('input', timing));
+timing();
+
+function math(){
+  const ms = Math.max(1, +$('ms').value||8);
+  const spr = 800*ms, mmrev = 32, spm = spr/mmrev;
+  $('m-spr').textContent = spr;
+  $('m-spm').textContent = spm.toFixed(0);
+  $('m-cyc').textContent = (1600/spm).toFixed(2);
+  $('m-vel').textContent = (1000/spm).toFixed(2);
+}
+$('ms').addEventListener('input', math); math();
+
+function takeXY(p){ const r=Math.floor(p/5), c=p%5; return {x:9.5-r*2.5, y:13.4+c*6.8}; }
+function placeH(p){ const r=Math.floor(p/9), c=p%9; return {x:40.5-r*3.2, y:13.3+c*3.2+1.6}; }
+function placeV(p){ const r=Math.floor(p/10), c=p%10; return {x:40.5-r*3.2-1.6, y:13.3+c*3.2}; }
+function xy(){
+  const t = takeXY(Math.max(0,Math.min(19,+$('tp').value||0)));
+  const p = $('ori').value==='V' ? placeV(+$('rp').value||0) : placeH(+$('rp').value||0);
+  $('txy').textContent = t.x.toFixed(1)+', '+t.y.toFixed(1);
+  $('pxy').textContent = p.x.toFixed(1)+', '+p.y.toFixed(1);
+  $('tst').textContent = Math.round(t.x*200)+', '+Math.round(t.y*200);
+  $('man').textContent = (Math.abs(p.x-t.x)+Math.abs(p.y-t.y)).toFixed(1);
+}
+['tp','rp','ori'].forEach(id => $(id).addEventListener('input', xy)); xy();
+
+function decode(){
+  const raw = $('line').value.trim();
+  const tok = raw.split(/\s+/);
+  if (tok[0] !== 'start'){ $('dec').textContent = 'ignored: first token is not start'; return; }
+  const n = parseInt(tok[1],10);
+  if (!n){ $('dec').textContent = 'N missing or 0 — original loop would still run 0 times'; return; }
+  const rest = tok.slice(2).map(x => parseInt(x,10));
+  const lines = ['arm job', 'N = '+n+' pairs'];
+  if (rest.length < 2*n) lines.push('TRUNCATED — missing '+(2*n-rest.length)+' ints. toInt() of empty is 0, so leftover pairs pick bin 0.');
+  for (let i=0;i<n;i++){
+    const a = rest[2*i], b = rest[2*i+1];
+    const t = takeXY(a||0);
+    lines.push('pair '+(i+1)+': take '+(a??0)+' @ '+t.x.toFixed(1)+','+t.y.toFixed(1)+'  → place '+(b??0)+'  (H/V unknown: replace_decoded commented)');
+  }
+  lines.push('no checksum, no ACK, 9600 baud, Serial.readString()');
+  $('dec').textContent = lines.join('\n');
+}
+$('decode').onclick = decode; decode();
+
+const STATES = ['IDLE','HOMING_Z','HOMING_X','HOMING_Y','READY','MOVE_TAKE','Z_DOWN','GRIP','Z_UP','MOVE_PLACE','ROTATE?','Z_DOWN','RELEASE','Z_UP','NEXT','DONE'];
+let si = 0;
+function renderSM(){
+  $('sm').innerHTML = STATES.map((s,i)=>`<span class="state${i===si?' on':''}">${s}</span>`).join('');
+  $('sm-now').textContent = STATES[si];
+}
+$('sm-next').onclick = () => { si = (si+1)%STATES.length; renderSM(); };
+$('sm-rst').onclick = () => { si = 0; renderSM(); };
+renderSM();
+
+const JR = [
+  ['photo','JPEG 640×640, Circuit 7'],
+  ['OCR','digits punched out of the binary'],
+  ['geometry miss','zigzag is not two parallel plates'],
+  ['HOG 3249-D','block L2-Hys, no vector L2'],
+  ['RBF SVM','label 1 + 3 → resistor'],
+  ['GUI stage 1','human keeps or relabels'],
+  ['.asc','SYMBOL res … SYMATTR Value 220'],
+  ['unfinished parser','should become start 1 10 5'],
+  ['USB 9600','Mega readString'],
+  ['take 10','(4.5, 13.4) mm, Z 144 down, grip 20°'],
+  ['place H 5','(40.5, 30.9) mm, release'],
+  ['board','a 220 Ω standing on wood, not a soldered 0603']
+];
+let ji = 0;
+function renderJR(){
+  $('jr').innerHTML = JR.map((s,i)=>`<span class="jstep${i===ji?' on':''}">${s[0]}</span>`).join('');
+  $('jr-txt').textContent = JR[ji][0]+' — '+JR[ji][1];
+}
+$('jr-next').onclick = () => { ji = (ji+1)%JR.length; renderJR(); };
+$('jr-rst').onclick = () => { ji = 0; renderJR(); };
+renderJR();
+</script>
+</body>
+</html>
