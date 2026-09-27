@@ -1,0 +1,368 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>SECB: Simple Electric Circuit Builder</title>
+<meta name="description" content="Educational project page for SECB, a 2022 Cartesian pick-and-place that builds a prototype circuit from a photograph of a schematic." />
+<meta property="og:title" content="SECB — Simple Electric Circuit Builder" />
+<meta property="og:description" content="A teaching Cartesian pick-and-place: photograph a schematic, recognize parts, pick from a 4×5 take grid, place on a 10×7 board." />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Source+Serif+4:opsz,wght@8..60,600&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css" />
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js"
+  onload="renderMathInElement(document.body,{delimiters:[{left:'$$',right:'$$',display:true},{left:'$',right:'$',display:false}]});"></script>
+<style>
+:root {
+  --ink: #1a1a1a; --muted: #5b6570; --line: #e6e8eb; --paper: #ffffff;
+  --wash: #f6f7f9; --accent: #367dbd; --accent-soft: #e8f1f8;
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; padding: 0; }
+body {
+  font-family: Inter, "Helvetica Neue", Arial, sans-serif;
+  color: var(--ink); background: linear-gradient(#fff, var(--wash));
+  line-height: 1.65;
+}
+.wrap { max-width: 900px; margin: 0 auto; padding: 56px 22px 80px; }
+h1 {
+  font-size: clamp(1.55rem, 3.2vw, 2.15rem); font-weight: 700;
+  letter-spacing: -0.02em; line-height: 1.25; text-align: center; margin: 0 0 18px;
+}
+.acronym {
+  text-align: center; font-family: "Source Serif 4", Georgia, serif;
+  font-size: clamp(1.05rem, 2.2vw, 1.35rem); line-height: 1.55;
+  margin: 0 0 14px; color: #243040;
+}
+.acronym b { color: var(--accent); font-weight: 700; }
+.venue {
+  text-align: center; font-size: 0.92rem; letter-spacing: 0.08em;
+  text-transform: uppercase; color: var(--muted); margin: 0 0 18px;
+}
+.authors, .affil { text-align: center; margin: 0 0 8px; }
+.authors a { color: var(--accent); text-decoration: none; font-weight: 600; }
+.authors a:hover { text-decoration: underline; }
+sup { font-size: 0.7em; color: var(--muted); }
+.affil { color: var(--muted); font-size: 0.95rem; }
+.pills {
+  display: flex; flex-wrap: wrap; justify-content: center; gap: 8px;
+  margin: 22px 0 36px;
+}
+.pills a {
+  display: inline-block; padding: 7px 14px; border: 1px solid #c9d7e6;
+  border-radius: 999px; color: var(--accent); text-decoration: none;
+  font-size: 0.88rem; font-weight: 600; background: #fff;
+}
+.pills a:hover { background: var(--accent-soft); }
+figure { margin: 0 0 18px; }
+figure img, figure video, figure iframe, figure svg {
+  width: 100%; display: block; border-radius: 10px;
+  border: 1px solid var(--line); background: #111;
+}
+figure svg { background: #0f1720; }
+figcaption { color: var(--muted); font-size: 0.86rem; margin-top: 8px; text-align: center; }
+h2 {
+  font-size: 1.35rem; margin: 42px 0 12px; padding-top: 8px;
+  border-top: 1px solid var(--line);
+}
+h3 { font-size: 1.05rem; margin: 22px 0 8px; }
+ul { padding-left: 1.15rem; }
+li { margin: 0.4rem 0; }
+.abstract, p { color: #222; }
+table { width: 100%; border-collapse: collapse; font-size: 0.92rem; }
+th, td { border-bottom: 1px solid var(--line); text-align: left; padding: 8px 10px; vertical-align: top; }
+th { color: var(--muted); font-weight: 600; font-size: 0.82rem; text-transform: uppercase; letter-spacing: 0.04em; }
+pre {
+  background: #1e2430; color: #e8eef6; padding: 16px 18px; border-radius: 10px;
+  overflow-x: auto; font-size: 0.84rem; line-height: 1.5;
+}
+code { font-size: 0.88em; }
+.eq {
+  background: var(--wash); border: 1px solid var(--line); border-radius: 10px;
+  padding: 14px 16px; overflow-x: auto;
+}
+.note { color: var(--muted); font-size: 0.9rem; }
+.grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+@media (max-width: 700px) { .grid2 { grid-template-columns: 1fr; } }
+.callout {
+  background: var(--accent-soft); border: 1px solid #c9d7e6; border-radius: 10px;
+  padding: 14px 16px; margin: 16px 0;
+}
+footer { margin-top: 48px; color: var(--muted); font-size: 0.82rem; text-align: center; }
+</style>
+</head>
+<body>
+<main class="wrap">
+  <h1>SECB: Simple Electric Circuit Builder</h1>
+  <p class="acronym">
+    A teaching Cartesian pick-and-place that turns a <b>photo of a schematic</b><br />
+    into a physical prototype on a wooden board.
+  </p>
+  <p class="venue">Hardware Graduation Project II &middot; An-Najah National University &middot; Dec 2022</p>
+  <p class="authors">
+    <a href="https://github.com/ahmaddroobi99">Ahmad Droobi</a><sup>1</sup>
+    &middot; Ibraheem Halasah<sup>1</sup>
+  </p>
+  <p class="affil"><sup>1</sup> Department of Computer Engineering, An-Najah National University<br />Supervisor: Dr. Raed Qadi</p>
+
+  <nav class="pills">
+    <a href="#pipeline">Pipeline</a>
+    <a href="#vision">Vision</a>
+    <a href="#motion">Motion</a>
+    <a href="#serial">Serial</a>
+    <a href="#timing">Timing</a>
+    <a href="#hardware">Hardware</a>
+    <a href="#simulate">Simulate</a>
+    <a href="#budget">BC budget</a>
+    <a href="https://github.com/ahmaddroobi99/GP2_HW_-Circuit_Recognition_2022">Vision repo</a>
+    <a href="https://github.com/ahmaddroobi99/GP2_CNC_P-P_ELECTRICAL_CurcuitBuilder_2022">Firmware repo</a>
+    <a href="https://drive.google.com/drive/folders/1K1DmhLfmM8PuO5Y98O2zz84EoSmtWm6j">Drive archive</a>
+    <a href="https://ahmaddroobi99.github.io/">Home</a>
+  </nav>
+
+  <figure>
+    <svg viewBox="0 0 900 220" role="img" aria-label="SECB pipeline from photo to placement">
+      <rect width="900" height="220" fill="#0f1720"/>
+      <g font-family="Inter, sans-serif" font-size="13" fill="#d7e4f2">
+        <rect x="20" y="70" width="120" height="70" rx="10" fill="#1d2a38" stroke="#4d7ea8"/>
+        <text x="80" y="100" text-anchor="middle" font-weight="600">Photo</text>
+        <text x="80" y="120" text-anchor="middle" fill="#9bb0c4" font-size="11">640×640 JPEG</text>
+        <rect x="170" y="70" width="130" height="70" rx="10" fill="#1d2a38" stroke="#4d7ea8"/>
+        <text x="235" y="100" text-anchor="middle" font-weight="600">Pi 4 vision</text>
+        <text x="235" y="120" text-anchor="middle" fill="#9bb0c4" font-size="11">OCR + HOG-SVM</text>
+        <rect x="330" y="70" width="120" height="70" rx="10" fill="#1d2a38" stroke="#4d7ea8"/>
+        <text x="390" y="100" text-anchor="middle" font-weight="600">LTspice</text>
+        <text x="390" y="120" text-anchor="middle" fill="#9bb0c4" font-size="11">.asc netlist</text>
+        <rect x="480" y="70" width="130" height="70" rx="10" fill="#1d2a38" stroke="#4d7ea8"/>
+        <text x="545" y="100" text-anchor="middle" font-weight="600">USB serial</text>
+        <text x="545" y="120" text-anchor="middle" fill="#9bb0c4" font-size="11">9600, start N t r</text>
+        <rect x="640" y="70" width="120" height="70" rx="10" fill="#1d2a38" stroke="#4d7ea8"/>
+        <text x="700" y="100" text-anchor="middle" font-weight="600">Mega 2560</text>
+        <text x="700" y="120" text-anchor="middle" fill="#9bb0c4" font-size="11">XYZ + servos</text>
+        <rect x="790" y="70" width="90" height="70" rx="10" fill="#2a3d2f" stroke="#6aa57a"/>
+        <text x="835" y="100" text-anchor="middle" font-weight="600">Place</text>
+        <text x="835" y="120" text-anchor="middle" fill="#9bb0c4" font-size="11">4×5 / 10×7</text>
+        <path d="M140 105 H170 M300 105 H330 M450 105 H480 M610 105 H640 M760 105 H790" stroke="#6ea0c8" stroke-width="2" marker-end="url(#arr)"/>
+      </g>
+      <defs><marker id="arr" markerWidth="8" markerHeight="8" refX="6" refY="4" orient="auto"><path d="M0 0 L8 4 L0 8 Z" fill="#6ea0c8"/></marker></defs>
+    </svg>
+    <figcaption>End-to-end data path. Vision never talks to motors. The Mega never sees pixels.</figcaption>
+  </figure>
+
+  <h2>TL;DR</h2>
+  <ul>
+    <li>Undergraduate teaching machine: metal Cartesian gantry, wood take/replace boards, jaw gripper — not an SMT chip shooter.</li>
+    <li>A photograph of a drawn schematic is classified into six symbols (V, C, GND, D, R, L), written as LTspice <code>.asc</code>, then mapped onto bins the arm can visit.</li>
+    <li>Three brains: Raspberry Pi 4 (vision), Arduino Mega 2560 (motion), ESP32 (Wi-Fi jog). IR remote is a third jog path.</li>
+    <li>Honest speed: about <strong>40–70 components per hour</strong> as coded. Z travel is most of the cycle. Desktop OpenPnP is ~15× faster; factory SMT is ~1000×.</li>
+    <li>This page is the 2026 packaging. The 2022 report, photos, firmware, and demos stay in Drive and private GitHub.</li>
+  </ul>
+
+  <h2>Abstract</h2>
+  <p class="abstract">
+    SECB is a one-semester computer-engineering machine that treats circuit assembly as pick-and-place.
+    The operator photographs a schematic. Software on a Raspberry Pi segments ink, reads handwritten digits,
+    classifies six component classes, and exports an LTspice netlist. A Mega 2560 then homes three steppers
+    against limit switches, picks a part from a 20-bin take grid, and drops it on a replace grid — optionally
+    rotating the wrist 74&deg; for vertical parts. The project was built under Arduino-class controllers,
+    a student budget of more than 4,000 NIS, and a four-month calendar. It is a laboratory for vision,
+    serial protocols, and Cartesian kinematics, not a substitute for OpenPnP or a Yamaha mounter.
+    This page rewrites that work as a survey so the machine can be studied, simulated, or rebuilt in Vancouver
+    without standing next to the original frame.
+  </p>
+
+  <h2 id="pipeline">Pipeline</h2>
+  <p>Two coordinate systems never mix. Vision lives in a 640&times;640 pixel page and an LTspice sheet. Motion lives in millimetres from the home corner of a wooden table.</p>
+  <ol>
+    <li>Load a JPEG. Resize to 640&times;640.</li>
+    <li>OCR digits first so numbers are not mistaken for parts.</li>
+    <li>Threshold, skeletonize, pair endpoints into parallel strokes &rarr; voltage source, capacitor, ground.</li>
+    <li>Erase wires with a line-segment detector. Remaining blobs go to HOG + SVM &rarr; diode, resistor, inductor.</li>
+    <li>A three-stage GUI lets a human delete, add, or relabel boxes.</li>
+    <li>Remaining ink becomes nodes. Each part is snapped to LTspice pin pitch and written as <code>.asc</code>.</li>
+    <li>A planned parser was supposed to emit <code>start N take place take place &hellip;</code> on USB 9600. That glue is unfinished.</li>
+    <li>The Mega homes, then runs <code>take_a_piece</code> and a horizontal or vertical place.</li>
+  </ol>
+
+  <h2 id="vision">Vision</h2>
+  <p>Entry point: <code>schematic_generator.py</code> in the Circuit-Solver repo. The detector is two families, not one network.</p>
+  <table>
+    <thead><tr><th>idx</th><th>Part</th><th>How it is found</th></tr></thead>
+    <tbody>
+      <tr><td>0</td><td>voltage source</td><td>two parallel skeleton strokes, length ratio > 1.2</td></tr>
+      <tr><td>1</td><td>capacitor</td><td>two strokes, ratio 1.0–1.2</td></tr>
+      <tr><td>2</td><td>ground</td><td>three parallel strokes</td></tr>
+      <tr><td>3</td><td>diode</td><td>HOG + SVM label 0, then +3</td></tr>
+      <tr><td>4</td><td>resistor</td><td>SVM label 1 + 3</td></tr>
+      <tr><td>5</td><td>inductor</td><td>SVM label 2 + 3</td></tr>
+    </tbody>
+  </table>
+  <p>Digits use a Keras MNIST model on 32&times;32 Canny blobs. Nearby digits (distance &le; 50 px) merge into multi-digit values. A value box within 100 px of a part becomes <code>SYMATTR Value</code>. Units such as k, &micro;, &Omega; are not parsed.</p>
+  <p class="note">The geometry + HOG-SVM core follows the open-source circuit-recognizer / Automatic-Circuit-Recognition line. SECB added value OCR, an LTspice writer, and the machine handoff. <code>pylsd</code> on the Pi was the painful dependency.</p>
+
+  <h2 id="motion">Motion</h2>
+  <p>Source of truth is Drive <code>final_project</code>, not the early GitHub sketch. Enable pins sit LOW. Servos must run from an external 5 V supply or USB serial dies.</p>
+  <table>
+    <thead><tr><th>Axis</th><th>DIR / STEP / EN</th><th>Limit</th></tr></thead>
+    <tbody>
+      <tr><td>X</td><td>42 / 44 / 46</td><td>30</td></tr>
+      <tr><td>Y</td><td>23 / 25 / 27</td><td>32</td></tr>
+      <tr><td>Z</td><td>43 / 45 / 47</td><td>34</td></tr>
+      <tr><td>Rotate servo</td><td>pin 24, 74&deg;</td><td></td></tr>
+      <tr><td>Gripper servo</td><td>pin 26, 20&deg;</td><td></td></tr>
+    </tbody>
+  </table>
+  <p>One cycle is 8 mm = 1600 microsteps. XY pulses at 1 kHz &rarr; 5 mm/s, X then Y, no acceleration. Z is faster and travels 18 cycles (144 mm) every down or up.</p>
+  <div class="eq">
+    $$r = \lfloor p/5 \rfloor,\quad c = p \bmod 5,\quad x_{\mathrm{take}} = 9.5 - r\cdot 2.5,\quad y_{\mathrm{take}} = 13.4 + c\cdot 6.8$$
+  </div>
+  <p>Take slots are 0&hellip;19. Horizontal place uses a 9-wide index and a +1.6 mm half-piece offset on Y. Vertical place uses a 10-wide index, a &minus;1.6 mm offset on X, and the 74&deg; wrist.</p>
+  <p>Home order: Z, then X, then Y. Each axis creeps until its switch reads LOW five times.</p>
+
+  <h2 id="serial">Serial and other ports</h2>
+  <p>Three control paths share the same mechanics.</p>
+  <h3>1. Job protocol &mdash; Pi &rarr; USB 9600</h3>
+  <pre>start <N> <take0> <place0> <take1> <place1> ...</pre>
+  <p><code>parse_raspberry_input()</code> is an empty stub. The commented production loop reads one space-separated line with <code>Serial.readString()</code>. The flashed sketch ignores serial and plays a hardcoded demo (take 10 / place H 5 / take 12 / place V 3 / &hellip;). <code>replace_decoded()</code>, which should pick horizontal vs vertical from the schematic angle, is commented out.</p>
+  <h3>2. Wi-Fi jog &mdash; browser &rarr; ESP32 HTTP &rarr; UART 115200</h3>
+  <p>Routes: <code>/x_up /x_down /y_up /y_down /z_up /z_down /gr_op /gr_cl</code>. The ESP32 prints <code>ard1 x_up</code> and friends. Jog step is ~0.1 mm on XY and ~0.25 mm on Z. SSID credentials in the 2022 sketch are not reproduced here.</p>
+  <h3>3. IR jog &mdash; NEC remote on Mega pin 6</h3>
+  <p>Eight button codes plus hold-repeat <code>0xFFFFFFFF</code>. Quirk: jog firmware drives the rotate servo for “gripper open/close,” not the gripper servo.</p>
+  <p class="note">The Drive parser zip prints wires and values from a hardcoded <code>.asc</code>. It does not emit the <code>start N &hellip;</code> line. Vision and motion are finished islands. The bridge is not.</p>
+
+  <h2 id="timing">Timing</h2>
+  <p>Factories quote CPH. This firmware quotes blocking seconds.</p>
+  <div class="eq">$$\mathrm{CPH} = 3600 / T_{\mathrm{cycle}}$$</div>
+  <p>One pick-and-place is four 144 mm Z strokes plus a 5 mm/s XY tour. Z is ~70% of the cycle. A representative part is ~50&ndash;90 s &rarr; about 40&ndash;70 CPH before homing. That sits next to careful hand stuffing, not next to a chip shooter.</p>
+  <table>
+    <thead><tr><th>Class</th><th>Typical tact</th><th>CPH-ish</th></tr></thead>
+    <tbody>
+      <tr><td>SECB as coded</td><td>~50&ndash;90 s</td><td>~40&ndash;70</td></tr>
+      <tr><td>Hand place, easy passives</td><td>~20&ndash;40 s</td><td>~90&ndash;180</td></tr>
+      <tr><td>LumenPnP / desktop OpenPnP</td><td>~2&ndash;4 s</td><td>~900&ndash;1,600</td></tr>
+      <tr><td>Flexible factory mounter (IPC-9850 chips)</td><td>~0.08&ndash;0.12 s</td><td>~30k&ndash;45k</td></tr>
+    </tbody>
+  </table>
+  <p>Industrial machines do not win by pulsing an A4988 harder. They delete the long Z, pick several parts per XY tour, and overlap vision with flight. Raising <code>delayMicroseconds</code> on this frame mostly loses steps.</p>
+
+  <h2 id="hardware">Hardware A&ndash;Z</h2>
+  <h3>Mechanics</h3>
+  <ul>
+    <li>Welded metal skeleton, wood base, two wood boards (take left, replace right).</li>
+    <li>6 mm timing belt, ~4 m; 16-tooth pulleys. Measured 32 mm of belt per motor revolution.</li>
+    <li>Gripper on a rail that rides the gantry. Later notes mention a magnet + relay as an accuracy experiment.</li>
+  </ul>
+  <h3>Actuators and power</h3>
+  <ul>
+    <li>Steppers: 2&times; J-5718HB2401 + 1&times; J-5718HB3401 (NEMA-23 class).</li>
+    <li>Drivers: 3&times; YS-DIV268N / A4988-class, 1 k&Omega; series resistors on DIR/STEP/EN so USB does not drop.</li>
+    <li>2&times; S3003 servos on a separate 5 V PSU. 12 V PSU for the steppers.</li>
+    <li>3&times; door-style limit switches with <code>ezButton</code> pull-ups.</li>
+  </ul>
+  <h3>Computers</h3>
+  <ul>
+    <li><strong>Arduino Mega 2560</strong> &mdash; motion master. Owns every stepper and servo.</li>
+    <li><strong>Raspberry Pi 4</strong> &mdash; vision host. Any laptop works; the Pi was chosen because it is portable.</li>
+    <li><strong>ESP32</strong> &mdash; HTTP jog endpoint. SoftSerial to Mega pins 10/11.</li>
+  </ul>
+  <p>Original student cost: more than 4,000 NIS. Build photos and three demo clips (14 Jan 2023) live in the Drive archive linked above.</p>
+  <p>
+    <a href="https://drive.google.com/drive/folders/1C9CJgpw0Hlugn_VyzSKLVAJQH3sg9QHD">Step-by-step photos</a>
+    &middot;
+    <a href="https://drive.google.com/drive/folders/1vFLRxoUvqkux6Xzh8w1vmTpvHsnXKOje">Demo videos</a>
+    &middot;
+    <a href="https://drive.google.com/file/d/1_luFaR701UoDiZLE1oO8vNoT79IAQbO0/view">Final report PDF</a>
+  </p>
+
+  <h2>What works, what does not</h2>
+  <div class="grid2">
+    <div>
+      <h3>Finished</h3>
+      <ul>
+        <li>Homing on three limits</li>
+        <li>Take 0&ndash;19 and H/V place</li>
+        <li>USB job grammar</li>
+        <li>Wi-Fi and IR jog</li>
+        <li>Six-class recognizer + GUI correction</li>
+        <li><code>.asc</code> export</li>
+      </ul>
+    </div>
+    <div>
+      <h3>Unfinished</h3>
+      <ul>
+        <li>Empty <code>parse_raspberry_input()</code></li>
+        <li>Commented <code>replace_decoded()</code></li>
+        <li>Parser does not emit <code>start N</code></li>
+        <li>Flashed loop is a demo sequence</li>
+        <li>Jog “gripper” moves the wrist</li>
+        <li>No vacuum sense, no soft limits beyond dest < 0</li>
+      </ul>
+    </div>
+  </div>
+
+  <h2 id="simulate">Simulate the whole job without the frame</h2>
+  <p>No single website draws the gantry, sells the bolts, routes the PCB, compiles the Mega sketch, and places 0402s. Use a stack. That is how this kind of machine is taught now.</p>
+  <table>
+    <thead><tr><th>Layer</th><th>Tool</th><th>What you get</th></tr></thead>
+    <tbody>
+      <tr><td>1. Vision</td><td>Existing Circuit-Solver in VS Code or Colab</td><td>JPEG &rarr; boxes &rarr; <code>.asc</code> on any laptop. No robot.</td></tr>
+      <tr><td>2. Firmware + wiring</td><td><a href="https://wokwi.com/">Wokwi</a> (browser + VS Code extension)</td><td>Mega 2560, ESP32, steppers, serial console. Jog the job string before you buy silicon.</td></tr>
+      <tr><td>3. Job-level PnP</td><td><a href="https://openpnp.org/">OpenPnP</a> built-in machine simulator</td><td>Feeders, bottom camera, job planner. Closest thing to “SMT without a machine.”</td></tr>
+      <tr><td>4. Mechanics</td><td><a href="https://www.onshape.com/">Onshape</a> (free cloud) or FreeCAD</td><td>Frame, rails, pulley stack. Browser CAD, no Fusion seat required.</td></tr>
+      <tr><td>5. Electrical / PCB</td><td><a href="https://www.kicad.org/">KiCad</a></td><td>Driver wiring, 1 k&Omega; series resistors, PSU split. EasyEDA if you want LCSC parts immediately.</td></tr>
+      <tr><td>6. Optional 3D plant</td><td>Webots or CoppeliaSim</td><td>Only if you want a moving twin. Overkill for this syllabus.</td></tr>
+    </tbody>
+  </table>
+  <div class="callout">
+    <strong>Recommended teaching path.</strong> Run vision on a sample JPEG first. Port <code>final_project</code> into Wokwi and prove <code>start 1 10 5</code> homes and prints the debug line. Open OpenPnP’s simulator to feel what a real job planner does with feeders. CAD the frame last, after the protocol is boring.
+  </div>
+  <p>Wokwi already has public Mega + multi-stepper CNC sketches. GRBL itself is a poor Wokwi guest (timer edge cases). Bit-bang firmware like SECB is a good guest. OpenPnP remains the right answer if the goal shifts from “replay 2022” to “learn SMT.”</p>
+
+  <h2 id="budget">Rebuild budget &mdash; Metro Vancouver, 2026</h2>
+  <p class="note">Street prices, Canadian dollars, tax extra. Ranges assume Amazon.ca / Digi-Key / Mouser / BC Robotics (Nanaimo, ships Canada-wide) / Lee’s Electronic on Main Street. Metalwork at Vancouver Hack Space or MakerLabs instead of a home welder.</p>
+  <table>
+    <thead><tr><th>Block</th><th>Wood teaching clone</th><th>2020 extrusion clone</th></tr></thead>
+    <tbody>
+      <tr><td>Mega 2560 + cables</td><td>$25&ndash;45</td><td>$25&ndash;45</td></tr>
+      <tr><td>Raspberry Pi 4/5 + camera</td><td>$110&ndash;180</td><td>$110&ndash;180</td></tr>
+      <tr><td>ESP32 + IR kit</td><td>$20&ndash;35</td><td>$20&ndash;35</td></tr>
+      <tr><td>3&times; NEMA 23 + drivers</td><td>$150&ndash;220</td><td>$180&ndash;280</td></tr>
+      <tr><td>2&times; servos + gripper</td><td>$35&ndash;70</td><td>$40&ndash;90</td></tr>
+      <tr><td>12 V + 5 V supplies</td><td>$50&ndash;90</td><td>$50&ndash;90</td></tr>
+      <tr><td>Belt, pulleys, rails</td><td>$80&ndash;150</td><td>$150&ndash;280</td></tr>
+      <tr><td>Frame + boards + fasteners</td><td>$80&ndash;160</td><td>$220&ndash;420</td></tr>
+      <tr><td>Wire, limits, resistors, proto</td><td>$40&ndash;70</td><td>$40&ndash;70</td></tr>
+      <tr><td>Makerspace / 3D print</td><td>$40&ndash;80</td><td>$60&ndash;120</td></tr>
+      <tr><td>Contingency ~15%</td><td>$100&ndash;160</td><td>$160&ndash;250</td></tr>
+      <tr><td><strong>Total CAD</strong></td><td><strong>$730&ndash;1,260</strong></td><td><strong>$1,055&ndash;1,860</strong></td></tr>
+    </tbody>
+  </table>
+  <p>Original 2022 spend was already past 4,000 NIS (roughly mid-four-figures CAD at the time) because steel was welded and parts were bought as one-offs. A Vancouver rebuild should use aluminum extrusion and a RAMPS-style shield unless the point is to repeat the welding lesson.</p>
+  <p>Shops and rooms: Lee’s Electronic (Main St.), Home Depot / Rona for wood and fasteners, BC Robotics and RobotShop for motors, VHS and MakerLabs for print and tap-and-die. Do not budget a Yamaha head. That is a different machine.</p>
+
+  <h2 id="bibtex">Cite this page</h2>
+  <pre>@misc{droobi2022secb,
+  title        = {SECB: Simple Electric Circuit Builder},
+  author       = {Droobi, Ahmad and Halasah, Ibraheem},
+  year         = {2022},
+  note         = {Hardware graduation project, An-Najah National University.
+                  Project page: https://ahmaddroobi99.github.io/secb/},
+  howpublished = {\url{https://ahmaddroobi99.github.io/secb/}}
+}</pre>
+
+  <footer>
+    Page theme follows the house academic layout used on
+    <a href="https://ahmaddroobi99.github.io/qg-lada/">QG-LaDA</a>
+    (RHINO-style).
+    Original hardware stayed with the 2022 build.
+    This page is the 2026 educational packaging.
+    <br />
+    <a href="https://ahmaddroobi99.github.io/">ahmaddroobi99.github.io</a>
+    &middot;
+    <a href="https://github.com/ahmaddroobi99/ahmaddroobi99.github.io">source</a>
+  </footer>
+</main>
+</body>
+</html>
