@@ -1,29 +1,92 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Ahmad Droobi</title>
-  <meta name="description" content="Ahmad Droobi — Applications Software Engineer. Scientific computing, data assimilation, and perception systems. MSc, University of Calgary, 2025." />
-  <meta name="theme-color" content="#f3efe6" />
-  <meta name="author" content="Ahmad Droobi" />
-  <link rel="canonical" href="https://ahmaddroobi99.github.io/" />
-  <link rel="icon" type="image/svg+xml" href="./favicon.svg" />
-  <link rel="apple-touch-icon" href="./portrait.jpg" />
-  <meta property="og:type" content="website" />
-  <meta property="og:title" content="Ahmad Droobi" />
-  <meta property="og:description" content="Applications Software Engineer. Scientific computing, data assimilation, and perception systems." />
-  <meta property="og:url" content="https://ahmaddroobi99.github.io/" />
-  <meta property="og:image" content="https://ahmaddroobi99.github.io/portrait.jpg" />
-  <meta name="twitter:card" content="summary" />
-  <meta name="twitter:title" content="Ahmad Droobi" />
-  <meta name="twitter:description" content="Applications Software Engineer. Scientific computing, data assimilation, and perception systems." />
-  <meta name="twitter:image" content="https://ahmaddroobi99.github.io/portrait.jpg" />
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,500;0,9..144,600;1,9..144,500&family=Outfit:wght@400;500;600&display=swap" rel="stylesheet" />
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>Ahmad Droobi</title>
+<meta name="description" content="Ahmad Droobi — Applications Software Engineer. Perception systems, robotics, and production Linux."/>
+<meta name="theme-color" content="#f3efe6"/>
+<meta name="author" content="Ahmad Droobi"/>
+<link rel="canonical" href="https://ahmaddroobi99.github.io/"/>
+<meta property="og:type" content="website"/>
+<meta property="og:url" content="https://ahmaddroobi99.github.io/"/>
+<meta property="og:title" content="Ahmad Droobi"/>
+<meta property="og:description" content="Applications Software Engineer — perception systems, robotics, and production Linux."/>
+<meta property="og:image" content="https://ahmaddroobi99.github.io/portrait.jpg"/>
+<meta name="twitter:card" content="summary"/>
+<meta name="twitter:site" content="@AhmadDroobi99"/>
+<link rel="icon" type="image/svg+xml" href="./favicon.svg"/>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;600&family=Outfit:wght@400;500;600&display=swap" rel="stylesheet"/>
+<link rel="stylesheet" href="./style.css"/>
+<script>
+(function(){try{var t=localStorage.getItem("theme");var d=t?t==="dark":matchMedia("(prefers-color-scheme: dark)").matches;if(d)document.documentElement.classList.add("dark")}catch(e){}})();
+</script>
 </head>
 <body>
-<!-- full file continues in next write if truncated -->
+<div class="page">
+  <div class="wash" aria-hidden="true"></div>
+  <div class="wrap">
+    <header>
+      <p class="loc">Vancouver, BC</p>
+      <button class="icon-btn" id="theme-toggle" type="button" aria-label="Switch to dark theme">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"/></svg>
+      </button>
+    </header>
+    <section class="hero">
+      <div class="avatar-wrap">
+        <span class="avatar-ring" aria-hidden="true"></span>
+        <img class="avatar" src="./portrait.jpg" alt="Portrait of Ahmad Droobi" width="116" height="116"/>
+      </div>
+      <p class="hello">Hello</p>
+      <h1>Ahmad Droobi</h1>
+      <p class="role">Applications Software Engineer</p>
+      <p class="tag">Perception systems · Robotics · Linux</p>
+      <p class="bio">I build reliable vision platforms for autonomous robots — LiDAR, cameras, and the production Linux systems that keep them running. MSc in Computer Engineering from the University of Calgary.</p>
+    </section>
+    <ul class="social" aria-label="Social">
+      <li><a href="https://github.com/ahmaddroobi99" target="_blank" rel="noopener noreferrer" aria-label="GitHub">GH</a></li>
+      <li><a href="https://www.linkedin.com/in/droobi7/" target="_blank" rel="noopener noreferrer" aria-label="LinkedIn">in</a></li>
+      <li><a href="https://x.com/AhmadDroobi99" target="_blank" rel="noopener noreferrer" aria-label="X">X</a></li>
+      <li><a href="https://scholar.google.com/citations?user=H-3pF00AAAAJ" target="_blank" rel="noopener noreferrer" aria-label="Google Scholar">GS</a></li>
+      <li><a href="mailto:ahmad.droobi1999@gmail.com" aria-label="Email">@</a></li>
+    </ul>
+    <div class="group">
+      <p class="group-label">Work</p>
+      <nav class="links" aria-label="Work">
+        <a class="card" href="./projects/"><span class="well">01</span><span class="copy"><strong>Projects</strong><span>Research first, undergraduate last</span></span><span class="arrow">↗</span></a>
+        <a class="card" href="./qg-lada/"><span class="well">02</span><span class="copy"><strong>QG-LaDA Lab</strong><span>Spectral QG twin + localized EnKF</span></span><span class="arrow">↗</span></a>
+        <a class="card" href="https://ucalgary.scholaris.ca/items/b4a3d3b9-4fbf-4d1e-8e1e-80c71c009825" target="_blank" rel="noopener noreferrer"><span class="well">03</span><span class="copy"><strong>Master’s thesis</strong><span>Data-driven filtering for turbulent flow, 2025</span></span><span class="arrow">↗</span></a>
+        <a class="card" href="https://www.equitechfutures.com/alumni/ahmad-hamdan-droobi" target="_blank" rel="noopener noreferrer"><span class="well">04</span><span class="copy"><strong>Equitech Futures</strong><span>Applied Data Institute alumnus, 2022</span></span><span class="arrow">↗</span></a>
+        <a class="card" href="https://github.com/ahmaddroobi99" target="_blank" rel="noopener noreferrer"><span class="well">05</span><span class="copy"><strong>GitHub</strong><span>Code, datasets, and experiments</span></span><span class="arrow">↗</span></a>
+        <a class="card" href="https://axis-vision-pan-tilt.netlify.app" target="_blank" rel="noopener noreferrer"><span class="well">06</span><span class="copy"><strong>AXIS Vision</strong><span>Camera error over UART to STM32</span></span><span class="arrow">↗</span></a>
+      </nav>
+    </div>
+    <div class="group">
+      <p class="group-label">Studio</p>
+      <nav class="links" aria-label="Studio">
+        <a class="card" href="./pulse/"><span class="well">P</span><span class="copy"><strong>PULSE</strong><span>16-step drum machine</span></span><span class="arrow">↗</span></a>
+        <a class="card" href="./locus/"><span class="well">L</span><span class="copy"><strong>Locus</strong><span>Interactive function grapher</span></span><span class="arrow">↗</span></a>
+        <a class="card" href="./quiver/"><span class="well">Q</span><span class="copy"><strong>Quiver</strong><span>Vector field plotter</span></span><span class="arrow">↗</span></a>
+        <a class="card" href="./aether-one/"><span class="well">A</span><span class="copy"><strong>Aether One</strong><span>3D headphone viewer</span></span><span class="arrow">↗</span></a>
+        <a class="card" href="./qr/"><span class="well">I</span><span class="copy"><strong>Imprint</strong><span>QR generator</span></span><span class="arrow">↗</span></a>
+      </nav>
+    </div>
+    <div class="group">
+      <p class="group-label">Contact</p>
+      <nav class="links" aria-label="Contact">
+        <a class="card" href="https://www.linkedin.com/in/droobi7/" target="_blank" rel="noopener noreferrer"><span class="well">in</span><span class="copy"><strong>LinkedIn</strong><span>Work, writing, and experience</span></span><span class="arrow">↗</span></a>
+        <a class="card" href="https://privatedro.github.io/" target="_blank" rel="noopener noreferrer"><span class="well">CV</span><span class="copy"><strong>Academic homepage</strong><span>Research notes, CV, and updates</span></span><span class="arrow">↗</span></a>
+        <a class="card" href="https://scholar.google.com/citations?user=H-3pF00AAAAJ" target="_blank" rel="noopener noreferrer"><span class="well">GS</span><span class="copy"><strong>Google Scholar</strong><span>Papers and citations</span></span><span class="arrow">↗</span></a>
+        <a class="card" href="mailto:ahmad.droobi1999@gmail.com"><span class="well">@</span><span class="copy"><strong>Email</strong><span>ahmad.droobi1999@gmail.com</span></span><span class="arrow">↗</span></a>
+      </nav>
+    </div>
+    <p class="handle">@AhmadDroobi99</p>
+  </div>
+</div>
+<script>
+(function(){var btn=document.getElementById("theme-toggle");function sync(){var dark=document.documentElement.classList.contains("dark");btn.setAttribute("aria-label",dark?"Switch to light theme":"Switch to dark theme");document.querySelector('meta[name="theme-color"]').setAttribute("content",dark?"#12110f":"#f3efe6")}sync();btn.addEventListener("click",function(){document.documentElement.classList.toggle("dark");var dark=document.documentElement.classList.contains("dark");try{localStorage.setItem("theme",dark?"dark":"light")}catch(e){}sync()})})();
+</script>
 </body>
 </html>
